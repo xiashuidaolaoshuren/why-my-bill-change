@@ -186,7 +186,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F1 — Shell, tokens, and page states
 
-- [ ] **Do:** shadcn/ui init, Tailwind, editorial-ledger tokens from `prototype/styles.css`, `layout.tsx`, `globals.css`, and `page.tsx` with four views (upload, pending, result, error) wired but empty of data UI.
+- [x] **Do:** shadcn/ui init, Tailwind, editorial-ledger tokens from `prototype/styles.css`, `layout.tsx`, `globals.css`, and `page.tsx` with four views (upload, pending, result, error) wired but empty of data UI.
 
 - **Consumes:** section 8 design direction. B1 Next app (same repo).
 - **Produces:** routable `/` with hidden/shown views and skip link; no compare logic yet.
