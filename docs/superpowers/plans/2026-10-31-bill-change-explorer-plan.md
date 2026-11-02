@@ -200,7 +200,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F2 — Upload, samples, and pending
 
-- [ ] **Do:** `upload.tsx`: two drop zones, drag-and-drop, remove, disabled Compare until both files, `Use sample files` (fetches `samples/`*), submit calls `POST /api/compare`. Clear previous result/errors on submit. Pending ≥280ms with skeleton in table area.
+- [x] **Do:** `upload.tsx`: two drop zones, drag-and-drop, remove, disabled Compare until both files, `Use sample files` (fetches `samples/`*), submit calls `POST /api/compare`. Clear previous result/errors on submit. Pending ≥280ms with skeleton in table area.
 
 - **Consumes:** B4 API. `samples/before.csv` and `samples/after.csv`.
 - **Produces:** working upload → pending → result or error transition.

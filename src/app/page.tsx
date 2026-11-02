@@ -1,15 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { UploadPanel, type BillFileSlots } from "@/components/upload";
+import type { CompareResponse } from "@/core/present";
+import type { BillSide, ValidationError } from "@/core/validate";
+import {
+  loadHeadlineSample,
+  loadInvalidSample,
+  SAMPLE_LOAD_FAILURE,
+} from "@/lib/load-sample";
 
 /**
  * F1 renders the four views the prototype settles: upload, pending, result,
- * error. They are wired (hidden/shown, focus, live region) but carry no data
- * UI yet. F2 replaces the dev-only view switch with the real transitions.
+ * error. F2 wires upload, samples, and POST /api/compare into that shell.
  */
 type View = "upload" | "loading" | "result" | "error";
 
 const VIEW_ORDER: readonly View[] = ["upload", "loading", "result", "error"];
+
+const MIN_PENDING_MS = 280;
+
+const FAILURE_MESSAGE =
+  "The comparison could not be completed. Nothing from it is shown.";
+
+const SIDE_LABEL: Record<BillSide, string> = {
+  before: "Before bill",
+  after: "After bill",
+};
 
 const ANNOUNCEMENTS: Record<View, string> = {
   upload: "Upload state. Add both bills to compare them.",
@@ -18,13 +35,35 @@ const ANNOUNCEMENTS: Record<View, string> = {
   error: "Comparison not possible.",
 };
 
+const SKELETON_ROW_COUNT = 6;
+
 function isView(value: string | null): value is View {
   return value !== null && (VIEW_ORDER as readonly string[]).includes(value);
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function announceToRegion(setAnnouncement: (value: string) => void, message: string) {
+  setAnnouncement("");
+  window.requestAnimationFrame(() => setAnnouncement(message));
 }
 
 export default function Home() {
   const [view, setView] = useState<View>("upload");
   const [announcement, setAnnouncement] = useState("");
+  const [files, setFiles] = useState<BillFileSlots>({ before: null, after: null });
+  const [pendingFiles, setPendingFiles] = useState<BillFileSlots>({
+    before: null,
+    after: null,
+  });
+  const [result, setResult] = useState<CompareResponse | null>(null);
+  const [errors, setErrors] = useState<ValidationError[] | null>(null);
+  const [failure, setFailure] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const runRef = useRef(0);
 
   const headings = {
     upload: useRef<HTMLHeadingElement | null>(null),
@@ -33,9 +72,11 @@ export default function Home() {
     error: useRef<HTMLHeadingElement | null>(null),
   } satisfies Record<View, RefObject<HTMLHeadingElement | null>>;
 
-  // Track the view we have already presented. A first run (including the
-  // double-invoked effects of React strict mode) must not steal focus on load.
   const presentedView = useRef<View | null>(null);
+
+  const announce = useCallback((message: string) => {
+    announceToRegion(setAnnouncement, message);
+  }, []);
 
   useEffect(() => {
     if (presentedView.current === view) return;
@@ -45,16 +86,170 @@ export default function Home() {
     setAnnouncement(ANNOUNCEMENTS[view]);
     window.scrollTo({ top: 0 });
     headings[view].current?.focus({ preventScroll: true });
-    // The heading refs are stable; only the view decides where focus goes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
-  // Dev-only: ?view=error shows a state that F2 cannot reach yet.
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
+    if (files.before || files.after) return;
     const requested = new URLSearchParams(window.location.search).get("view");
     if (isView(requested)) setView(requested);
+  }, [files.before, files.after]);
+
+  const clearOutcome = useCallback(() => {
+    setResult(null);
+    setErrors(null);
+    setFailure(null);
   }, []);
+
+  const runComparison = useCallback(
+    async (nextFiles: { before: File; after: File }) => {
+      const run = ++runRef.current;
+      clearOutcome();
+      setPendingFiles({ before: nextFiles.before, after: nextFiles.after });
+      setView("loading");
+      setBusy(true);
+
+      const started = performance.now();
+      let response: Response;
+      try {
+        const body = new FormData();
+        body.set("before", nextFiles.before);
+        body.set("after", nextFiles.after);
+        response = await fetch("/api/compare", { method: "POST", body });
+      } catch {
+        const remaining = MIN_PENDING_MS - (performance.now() - started);
+        if (remaining > 0) await wait(remaining);
+        if (run !== runRef.current) {
+          setBusy(false);
+          return;
+        }
+        setFailure(FAILURE_MESSAGE);
+        setView("error");
+        setBusy(false);
+        return;
+      }
+
+      const remaining = MIN_PENDING_MS - (performance.now() - started);
+      if (remaining > 0) await wait(remaining);
+      if (run !== runRef.current) {
+        setBusy(false);
+        return;
+      }
+
+      if (response.status === 200) {
+        const data = (await response.json()) as CompareResponse;
+        setResult(data);
+        setView("result");
+        setBusy(false);
+        return;
+      }
+
+      if (response.status === 400) {
+        try {
+          const data = (await response.json()) as { errors?: ValidationError[] };
+          if (data.errors && data.errors.length > 0) {
+            setErrors(data.errors);
+            setView("error");
+            setBusy(false);
+            return;
+          }
+        } catch {
+          /* fall through to generic failure */
+        }
+      }
+
+      setFailure(FAILURE_MESSAGE);
+      setView("error");
+      setBusy(false);
+    },
+    [clearOutcome],
+  );
+
+  const onFile = useCallback((side: BillSide, file: File) => {
+    setFiles((prev) => ({ ...prev, [side]: file }));
+  }, []);
+
+  const onRemove = useCallback((side: BillSide) => {
+    setFiles((prev) => ({ ...prev, [side]: null }));
+  }, []);
+
+  const onCompare = useCallback(() => {
+    const { before, after } = files;
+    if (!before || !after) return;
+    void runComparison({ before, after });
+  }, [files, runComparison]);
+
+  const loadAndCompare = useCallback(
+    async (loader: () => Promise<{ before: File; after: File }>) => {
+      const gate = ++runRef.current;
+      clearOutcome();
+      setBusy(true);
+      try {
+        const loaded = await loader();
+        if (gate !== runRef.current) {
+          setBusy(false);
+          return;
+        }
+        setFiles(loaded);
+        await runComparison(loaded);
+      } catch {
+        if (gate !== runRef.current) {
+          setBusy(false);
+          return;
+        }
+        setFailure(SAMPLE_LOAD_FAILURE);
+        setView("error");
+        setBusy(false);
+      }
+    },
+    [clearOutcome, runComparison],
+  );
+
+  const onUseSample = useCallback(() => {
+    void loadAndCompare(loadHeadlineSample);
+  }, [loadAndCompare]);
+
+  const onUseInvalidSample = useCallback(() => {
+    void loadAndCompare(loadInvalidSample);
+  }, [loadAndCompare]);
+
+  const startOver = useCallback(() => {
+    runRef.current += 1;
+    clearOutcome();
+    setFiles({ before: null, after: null });
+    setPendingFiles({ before: null, after: null });
+    setBusy(false);
+    setView("upload");
+    announce("Comparison cleared. Add two bills to start again.");
+    window.requestAnimationFrame(() => {
+      document.getElementById("use-sample")?.focus({ preventScroll: true });
+    });
+  }, [announce, clearOutcome]);
+
+  const backToUpload = useCallback(() => {
+    runRef.current += 1;
+    clearOutcome();
+    setBusy(false);
+    setView("upload");
+    window.requestAnimationFrame(() => {
+      headings.upload.current?.focus({ preventScroll: true });
+    });
+  }, [clearOutcome, headings.upload]);
+
+  const loadingBefore = pendingFiles.before?.name ?? "…";
+  const loadingAfter = pendingFiles.after?.name ?? "…";
+
+  const resultBefore = files.before?.name;
+  const resultAfter = files.after?.name;
+
+  const errorCount = errors?.length ?? 0;
+  const errorTitle =
+    failure && errorCount === 0
+      ? "The comparison could not be completed"
+      : errorCount === 1
+        ? "1 issue blocked the comparison"
+        : `${errorCount} issues blocked the comparison`;
 
   return (
     <>
@@ -82,6 +277,17 @@ export default function Home() {
               digit.
             </p>
           </div>
+
+          <UploadPanel
+            files={files}
+            onFile={onFile}
+            onRemove={onRemove}
+            onCompare={onCompare}
+            onUseSample={onUseSample}
+            onUseInvalidSample={onUseInvalidSample}
+            busy={busy}
+            announce={announce}
+          />
         </section>
 
         <section
@@ -99,13 +305,80 @@ export default function Home() {
               className="loading-title"
               tabIndex={-1}
             >
-              Comparing both bills
+              Comparing{" "}
+              <span className="file-ref" id="loading-before">
+                {loadingBefore}
+              </span>{" "}
+              with{" "}
+              <span className="file-ref" id="loading-after">
+                {loadingAfter}
+              </span>
             </h1>
             <p className="lede" role="status">
               Reading both files, matching Services and checking the
               Reconciliation.
             </p>
           </header>
+          <div className="stats skeleton-stats" aria-hidden="true">
+            <div className="stat">
+              <span className="skel skel-label" />
+              <span className="skel skel-figure" />
+            </div>
+            <div className="stat">
+              <span className="skel skel-label" />
+              <span className="skel skel-figure" />
+            </div>
+            <div className="stat">
+              <span className="skel skel-label" />
+              <span className="skel skel-figure" />
+            </div>
+          </div>
+          <div className="services" aria-hidden="true">
+            <div className="table-wrap">
+              <table className="ledger skeleton-ledger">
+                <thead>
+                  <tr>
+                    <th className="col-service">
+                      <span className="th-static">Service</span>
+                    </th>
+                    <th className="col-status">
+                      <span className="th-static">Status</span>
+                    </th>
+                    <th className="num">
+                      <span className="th-static">Before Cost</span>
+                    </th>
+                    <th className="num">
+                      <span className="th-static">After Cost</span>
+                    </th>
+                    <th className="num">
+                      <span className="th-static">Total change</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: SKELETON_ROW_COUNT }, (_, index) => (
+                    <tr key={index}>
+                      <th className="col-service">
+                        <span className="skel skel-text" />
+                      </th>
+                      <td>
+                        <span className="skel skel-badge" />
+                      </td>
+                      <td>
+                        <span className="skel skel-money" />
+                      </td>
+                      <td>
+                        <span className="skel skel-money" />
+                      </td>
+                      <td>
+                        <span className="skel skel-money" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         <section
@@ -116,11 +389,21 @@ export default function Home() {
         >
           <header className="result-head">
             <div className="result-bar">
-              <p className="eyebrow">Comparison</p>
+              <p className="eyebrow">
+                Comparison
+                {resultBefore && resultAfter ? (
+                  <>
+                    {" · "}
+                    <span className="file-ref">{resultBefore}</span>
+                    {" → "}
+                    <span className="file-ref">{resultAfter}</span>
+                  </>
+                ) : null}
+              </p>
               <button
                 type="button"
                 className="btn btn-secondary btn-small"
-                onClick={() => setView("upload")}
+                onClick={startOver}
               >
                 Start over
               </button>
@@ -131,7 +414,7 @@ export default function Home() {
               className="summary"
               tabIndex={-1}
             >
-              The summary sentence appears here.
+              {result?.summary ?? "The summary sentence appears here."}
             </h1>
           </header>
         </section>
@@ -150,28 +433,63 @@ export default function Home() {
               className="error-title"
               tabIndex={-1}
             >
-              One of the bills could not be read
+              {errorTitle}
             </h1>
             <p className="lede">
-              Fix the rows listed below, then compare the bills again.
+              {failure && errorCount === 0
+                ? failure
+                : "Fix the rows listed below, then compare the bills again."}
             </p>
           </header>
-          <div className="action-row error-actions">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setView("upload")}
-            >
-              Back to upload
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setView("upload")}
-            >
-              Start over
-            </button>
-          </div>
+
+          {failure && errorCount > 0 ? (
+            <p className="failure-message">{failure}</p>
+          ) : null}
+
+          {errors && errors.length > 0 ? (
+            <ul className="validation-errors">
+              {errors.map((entry, index) => (
+                <li key={`${entry.file}-${entry.line}-${entry.column}-${index}`}>
+                  <strong>{SIDE_LABEL[entry.file]}</strong>
+                  {entry.line !== null ? ` · line ${entry.line}` : ""}
+                  {entry.column ? ` · ${entry.column}` : ""}
+                  {" — "}
+                  {entry.message}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {failure && errorCount === 0 ? null : (
+            <div className="action-row error-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={backToUpload}
+              >
+                Back to upload
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={startOver}
+              >
+                Start over
+              </button>
+            </div>
+          )}
+
+          {failure && errorCount === 0 ? (
+            <div className="action-row error-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={startOver}
+              >
+                Start over
+              </button>
+            </div>
+          ) : null}
         </section>
       </main>
 
