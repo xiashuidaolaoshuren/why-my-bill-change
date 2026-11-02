@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import {
+  Reconciliation,
+  RoundingNotice,
+  Stats,
+  SummarySentence,
+} from "@/components/headline";
 import { UploadPanel, type BillFileSlots } from "@/components/upload";
 import type { CompareResponse } from "@/core/present";
 import type { BillSide, ValidationError } from "@/core/validate";
@@ -243,6 +249,13 @@ export default function Home() {
   const resultBefore = files.before?.name;
   const resultAfter = files.after?.name;
 
+  // `pendingFiles` is set before every request and only read while a result is
+  // on screen, so it names the pair the result was computed from.
+  const comparedNames = {
+    before: pendingFiles.before?.name ?? resultBefore ?? "",
+    after: pendingFiles.after?.name ?? resultAfter ?? "",
+  };
+
   const errorCount = errors?.length ?? 0;
   const errorTitle =
     failure && errorCount === 0
@@ -414,9 +427,21 @@ export default function Home() {
               className="summary"
               tabIndex={-1}
             >
-              {result?.summary ?? "The summary sentence appears here."}
+              {result ? (
+                <SummarySentence parts={result.summaryParts} />
+              ) : (
+                "The summary sentence appears here."
+              )}
             </h1>
+            {result ? <RoundingNotice result={result} /> : null}
           </header>
+
+          {result ? (
+            <>
+              <Stats result={result} fileNames={comparedNames} />
+              <Reconciliation result={result} />
+            </>
+          ) : null}
         </section>
 
         <section

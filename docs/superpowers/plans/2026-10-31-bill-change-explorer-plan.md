@@ -214,7 +214,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F3 — Headline, stats, notice, reconciliation
 
-- [ ] **Do:** `headline.tsx`: render `summary` / `summaryParts` (underlined tone amounts, not interactive), `displayRoundingNotice` copy from prototype, three stat cards with conditional `Exact …` line, reconciliation block with exact values.
+- [x] **Do:** `headline.tsx`: render `summary` / `summaryParts` (underlined tone amounts, not interactive), `displayRoundingNotice` copy from prototype, three stat cards with conditional `Exact …` line, reconciliation block with exact values.
 
 - **Consumes:** JSON contract. F2 result state.
 - **Produces:** result header region complete except chart and table.
