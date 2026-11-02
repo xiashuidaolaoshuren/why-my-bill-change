@@ -1,7 +1,7 @@
 # "Why did my bill change?" explorer: Design
 
 Date: 2026-10-31
-Status: Reviewed
+Status: Reviewed. Static prototype built and reviewed on 2026-11-02 (section 8).
 
 Domain terms are defined in `CONTEXT.md`. This document specifies the product and its acceptance checks.
 
@@ -11,6 +11,8 @@ Compare two monthly expense or cloud-cost CSV exports and explain the difference
 
 Demo: upload the two sample files, select the added bucket, and expand Support to see the source line and calculation behind its HK$180.00 contribution.
 
+A static prototype, generated in OpenDesign and reviewed in a browser, fixes the interface before the Next.js build starts (section 8).
+
 The project is an interview work submission. It is judged on how well AI was directed and how the result was verified, so verification is a first-class part of the design. Budget: about 2 days at 4-6 hours per day. The review clarifications below fit that budget.
 
 ## 2. Decisions
@@ -19,6 +21,7 @@ The project is an interview work submission. It is judged on how well AI was dir
 |---|---|
 | Stack | Next.js (App Router) + React + TypeScript, Node runtime |
 | UI | Tailwind + shadcn/ui + a charting library (Recharts) |
+| Prototype | Static HTML in `prototype/`, generated in OpenDesign. It is the visual and interaction reference; the shipped app is still Next.js with `src/core` behind the API |
 | Arithmetic | decimal.js, configured for exact results on every accepted input |
 | Currency | HKD only. No conversion and no currency field |
 | Numeric limits | At most 12 integer digits and 12 fractional digits per quantity and unit price |
@@ -198,12 +201,62 @@ A single page built from shadcn/ui components. All money text, including the sum
 
 Exact values appear in tooltips and in the expanded row. Display strings appear in the chart labels, cards, table, and summary.
 
-## 8. Verification
+### Design direction
+
+The look is an editorial ledger: a warm paper canvas (`#f3f0e8`) with ink-black type (`#17140f`), hairline rules doing the structural work instead of card shadows, and 2px corners. Headings are set in Schibsted Grotesk and every figure in IBM Plex Mono with tabular numerals. One deep cobalt accent (`#2341b5`) marks selection; red (`#bf3a2b`) and green (`#2d7a4b`) encode money direction only and are always paired with a sign or an arrow. The summary sentence is the largest type on the page. Motion is limited to state changes and respects `prefers-reduced-motion`.
+
+Those values are the variables at the top of `prototype/styles.css`. The shadcn tokens are derived from them rather than chosen again.
+
+The prototype in section 8 implements this list and settles the details it leaves open.
+
+## 8. Prototype
+
+A static prototype was generated in OpenDesign and reviewed in a browser on 2026-11-02. It is the visual and interaction reference for the Next.js app. It is not shipped and it does not replace `src/core` or its tests.
+
+It lives in `prototype/` and opens by loading `prototype/index.html`. There is no build step, no server, and nothing to install.
+
+| File | Role |
+|---|---|
+| `index.html` | the four states: upload, pending, result, error |
+| `styles.css` | the design tokens and the "editorial ledger" look |
+| `exact.js` | BigInt decimals, CSV parsing, the Comparison, the Reconciliation assertion, display rounding, the summary sentence |
+| `demos.js` | the Headline, Rounding, Invalid and Opposing datasets as CSV text |
+| `app.js` | the state machine, upload, the waterfall, Bucket selection, the table |
+
+It implements section 5 unchanged: exact decimals with no floating point for money, the sequential usage-then-price split, the Reconciliation assertion, and independently rounded display strings. Its arithmetic is BigInt scaled integers rather than decimal.js: an input is held at 12 decimal places and a Cost, and everything derived from it, at 24, which covers a product of two 12.12-digit values without rounding. Parsing, validation and arithmetic run in the browser because the prototype has no server; the production app moves them into `src/core` behind `POST /api/compare`.
+
+It was checked in the browser against the headline sample and all four demo datasets, and its engine against the maximum-magnitude case, rounding half away from zero, and 300 random file pairs. The Reconciliation identity held in every pair and no console errors appeared during those interactions. These checks cover the prototype only; they do not satisfy section 9.
+
+### Settled by the prototype
+
+Where this specification is silent, the production UI follows the prototype. The details it settles:
+
+- Display strings carry thousands separators (`HK$1,234.00`). Exact strings do not.
+- Any amount whose exact value is non-zero and rounds to zero is described in the summary as "less than HK$0.01", not only the Total change. The sentence about the Total change in section 5 is the special case of this rule.
+- The result view shows the reconciliation with the exact values and a statement that the identity holds. The server assertion alone is not visible to the reader.
+- A stat card shows an `Exact …` line only when its amount is not a whole number of cents. Rows, chips and bars expose the exact value in a tooltip under the same rule.
+- Amounts in the summary sentence are underlined in their tone colour, increase red and decrease green. They are not interactive.
+- A Bucket without Contributors keeps its step in the waterfall, flat and labelled "No Contributors", and gets no chip. The chip row reads "No Contributors in …" when every Bucket is empty.
+- The waterfall draws vertical columns only while the canvas is at least 600px wide and the widest label fits beside its bar; otherwise it draws one horizontal row per step. The fit is measured, not a fixed breakpoint.
+- The pending state is held for at least 280ms so it registers instead of flickering. No work is simulated.
+- A failed Comparison clears the previous chart before the errors appear.
+
+### Prototype limits
+
+These are deliberate and do not carry over to the production app:
+
+- No 1 MB rejection and no 10,000-row cap; the API enforces section 4.
+- No server and no persistence: results live in page state and a reload clears them.
+- Fonts load from a CDN with a system fallback, so offline the page shows fallback fonts.
+- A Bucket effect smaller than a pixel draws no visible bar; its label and the display notice still describe it.
+- No automated tests and no Docker image. Verification of the production app remains section 9.
+
+## 9. Verification
 
 This is the main evidence of directing the AI. The hand-calculated cases are written before the calculation code.
 
 1. **Golden cases** in `tests/fixtures/<case>/`: `before.csv`, `after.csv`, `expected.json`, with answers calculated by hand. Cases:
-   - headline sample from section 9
+   - headline sample from section 10
    - only added
    - only removed
    - quantity change only
@@ -230,11 +283,12 @@ This is the main evidence of directing the AI. The hand-calculated cases are wri
 5. **Browser test** (one Playwright run): load the headline samples and check the summary shows HK$240.00. Select the added bucket. The table shows Support and hides Compute. Expand Support and check `after.csv`, source line 4, and HK$180.00. Then submit an invalid file and check that the previous chart is gone and the errors are shown.
 6. **CI** (GitHub Actions): type check, lint, tests, Docker build. A grep or lint check rejects `parseFloat` and `Number(` in `src/core`.
 
-## 9. Deliverables
+## 10. Deliverables
 
 - `README.md`: intro, screenshot or GIF, `docker run` command, CSV format, the HKD and quantity-unit assumptions, the formula with the worked example, and the architecture diagram.
 - `docs/AI_WORKFLOW.md`: tools used, key steps, time log, and a list of AI mistakes with the test that caught each. The time log starts with the first session.
 - `samples/`: the headline pair below, plus one invalid file.
+- `prototype/`: the static OpenDesign prototype described in section 8, kept as the visual reference. The README screenshot or GIF may be captured from it.
 - A Dockerfile producing one image that serves the app. Acceptance is a reviewer running that image locally. Public hosting is optional and outside the delivery commitment.
 
 ### Headline sample
@@ -266,19 +320,22 @@ Support,180,1
 
 Before total HK$170.00. Buckets: added HK$180.00, usage HK$60.00, price HK$20.00, removed −HK$20.00. After total HK$410.00. Total change HK$240.00. Each bucket has one contributor. No display-rounding notice.
 
-## 10. Out of scope
+## 11. Out of scope
 
 Currency conversion and currencies other than HKD. A quantity-unit column or any check that the quantity unit really stayed the same. Real AWS or GCP export formats. Fuzzy service-name matching. Persistence, accounts, and browser storage. Comparing more than two periods. A publicly hosted demo.
 
-## 11. Schedule
+## 12. Schedule
 
 - **Day 1:** project setup, hand-calculated fixtures, core calculation test-first, numeric bounds and precision, property tests, validation, display strings, and the API route.
 - **Day 2:** UI, bucket selection, display notice, Docker, the named-bucket Playwright test, replacement-upload behavior, CI, docs, and the demo GIF.
 
-## 12. Risks
+The prototype (section 8) already fixes the layout and the interactions, so Day 2 implements them in shadcn/ui rather than designing them.
+
+## 13. Risks
 
 - A reviewer may ask "where is the backend?" Mitigation: `src/core` and the API route are clearly separate, and the README diagram shows it.
 - AI-generated code may use floating point for money. Mitigation: property tests with tiny unit prices, maximum-magnitude fixtures, and a lint or grep check for `parseFloat` and `Number(` in `src/core`. Chart coordinates are the only permitted floating-point use.
 - Displayed cents may not add up. Mitigation: the notice, exact values in details, and a fixture where the discrepancy is visible.
 - A shared service name may hide a quantity-unit change. Mitigation: the README states the assumption and says the app cannot detect it.
-- Scope creep on UI polish. Mitigation: the table and waterfall are the only required views; everything else is optional.
+- Scope creep on UI polish. Mitigation: the table and waterfall are the only required views, the prototype in section 8 fixes the target, and everything else is optional.
+- The prototype and the production UI may drift. Mitigation: the prototype is checked in, section 8 lists the details it settles, and the Playwright test follows the same named flow.

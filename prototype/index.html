@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why did my bill change?</title>
+  <meta name="description" content="Compare two monthly bill CSV exports and see exactly where the Total change came from.">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+  <style>
+    /* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio, geometry.
+       Put this @layer first; product CSS outside the layer wins ordinary layout rules.
+       Native hidden and closed-dialog states take precedence over component display rules. */
+    @layer od-layout {
+      [hidden]:not([hidden="until-found" i]) { display: none !important; }
+      dialog:not([open]) { display: none !important; }
+
+      :where(.od-stack,.od-row,.od-row-top,.od-cluster,.od-grid,.od-field,.od-stat,.od-cell,.od-tile) > :where(*) { min-width: 0; }
+
+      /* containers */
+      .od-stack   { display: flex; flex-direction: column; gap: var(--od-gap, 8px); }
+      .od-row     { display: flex; align-items: center; gap: var(--od-gap, 8px); }
+      .od-row-top { display: flex; align-items: flex-start; gap: var(--od-gap, 8px); }
+      .od-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--od-gap, 8px); }
+      .od-fill    { flex: 1 1 0; min-width: 0; }
+      .od-fixed   { flex: none; }
+      .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
+
+      /* stacked information: each piece is its own line — never sibling inline spans */
+      .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+      :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+      .od-tile { display: grid; grid-template-rows: auto 1fr; }
+      :where(.od-tile) > :where(*) { display: block; }
+
+      .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
+      .od-media-cover { object-fit: cover; }
+
+      /* functional inline SVG icons opt into bounded geometry; content SVGs keep their own */
+      .od-icon { display: inline-block; inline-size: var(--od-icon-size, 1em); block-size: var(--od-icon-size, 1em); flex: none; }
+
+      /* data text only — authored copy is rewritten to its budget instead */
+      .od-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .od-clamp-2, .od-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+      .od-clamp-2 { -webkit-line-clamp: 2; }
+      .od-clamp-3 { -webkit-line-clamp: 3; }
+      .od-lines-2 { min-height: calc(2 * 1.4em); }
+      .od-nowrap  { white-space: nowrap; }
+      .od-keep    { word-break: keep-all; overflow-wrap: anywhere; }
+
+      .od-screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+      .od-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+
+      .od-rail { display: flex; gap: var(--od-gap, 8px); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+                 padding-inline: var(--od-rail-pad, 16px); scroll-padding-inline: var(--od-rail-pad, 16px); }
+      .od-rail::-webkit-scrollbar { display: none; }
+      :where(.od-rail) > :where(*) { flex: none; scroll-snap-align: start; }
+      :where(.od-rail) > :where(:last-child) { margin-inline-end: var(--od-rail-pad, 16px); }
+
+      .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
+      .od-touch  { min-width: 44px; min-height: 44px; }
+    }
+    :root [hidden]:where(:not([hidden="until-found" i])) { display: none; }
+    /* /OD-LAYOUT-PRIMITIVES v1 */
+  </style>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-view="upload">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <p class="wordmark">Why did my bill change?</p>
+      <p class="topbar-meta">Amounts in Hong Kong dollars · Files stay in this browser</p>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" tabindex="-1">
+
+    <!-- Upload state -->
+    <section id="view-upload" class="view view-upload" aria-labelledby="upload-title">
+      <div class="upload-intro">
+        <p class="eyebrow">New Comparison</p>
+        <h1 id="upload-title" class="upload-title" tabindex="-1">Compare two monthly bills</h1>
+        <p class="lede">Add the earlier and the later CSV export. Every dollar of the Total change is traced to a Service and sorted into four Buckets: added, usage, price and removed. The Reconciliation is exact to the last digit.</p>
+      </div>
+
+      <div class="upload-main">
+        <div class="dropzones">
+          <div class="dropzone" id="drop-before" data-side="before" data-filled="false">
+            <div class="dz-head">
+              <h2 class="dz-title">Before bill</h2>
+              <p class="dz-sub">The earlier month</p>
+            </div>
+            <div class="dz-empty">
+              <svg class="od-icon dz-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 10.5V2.5M4.75 5.75 8 2.5l3.25 3.25M2.5 10v3.5h11V10"/></svg>
+              <p class="dz-hint">Drag a CSV file here</p>
+              <button type="button" class="btn btn-secondary btn-small" data-choose="before" aria-label="Choose a CSV file for the Before bill">Choose file</button>
+            </div>
+            <div class="dz-file" hidden>
+              <p class="dz-name" data-file-name></p>
+              <p class="dz-meta" data-file-meta></p>
+              <div class="dz-file-actions">
+                <button type="button" class="btn-link" data-choose="before" aria-label="Replace the Before bill file">Replace</button>
+                <button type="button" class="btn-link" data-remove="before">Remove</button>
+              </div>
+            </div>
+            <input type="file" class="sr-only" id="file-before" accept=".csv,text/csv" tabindex="-1" aria-hidden="true">
+          </div>
+
+          <div class="dropzone" id="drop-after" data-side="after" data-filled="false">
+            <div class="dz-head">
+              <h2 class="dz-title">After bill</h2>
+              <p class="dz-sub">The later month</p>
+            </div>
+            <div class="dz-empty">
+              <svg class="od-icon dz-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 10.5V2.5M4.75 5.75 8 2.5l3.25 3.25M2.5 10v3.5h11V10"/></svg>
+              <p class="dz-hint">Drag a CSV file here</p>
+              <button type="button" class="btn btn-secondary btn-small" data-choose="after" aria-label="Choose a CSV file for the After bill">Choose file</button>
+            </div>
+            <div class="dz-file" hidden>
+              <p class="dz-name" data-file-name></p>
+              <p class="dz-meta" data-file-meta></p>
+              <div class="dz-file-actions">
+                <button type="button" class="btn-link" data-choose="after" aria-label="Replace the After bill file">Replace</button>
+                <button type="button" class="btn-link" data-remove="after">Remove</button>
+              </div>
+            </div>
+            <input type="file" class="sr-only" id="file-after" accept=".csv,text/csv" tabindex="-1" aria-hidden="true">
+          </div>
+        </div>
+
+        <div class="upload-actions">
+          <div class="action-row">
+            <button type="button" class="btn btn-primary" id="use-sample">Use sample files</button>
+            <button type="button" class="btn btn-secondary" id="compare-button" disabled aria-describedby="compare-hint">Compare bills</button>
+          </div>
+          <p class="hint" id="compare-hint">Add both bills to compare them.</p>
+          <div class="demo-links">
+            <p class="label" id="demo-label">Other samples</p>
+            <ul class="demo-list" id="demo-list" aria-labelledby="demo-label"></ul>
+          </div>
+        </div>
+      </div>
+
+      <aside class="format-note" aria-labelledby="format-title">
+        <h2 class="label" id="format-title">CSV format</h2>
+        <pre class="format-sample"><code>service,quantity,unit_price
+Compute,160,1
+Storage,50,1.40</code></pre>
+        <ul class="format-rules">
+          <li>All amounts are Hong Kong dollars (HK$). <code>unit_price</code> is the Cost of one Quantity unit.</li>
+          <li>Header names are trimmed and case-insensitive; extra columns are ignored.</li>
+          <li>Each Service appears once per file and matches across bills by its exact name.</li>
+          <li>Plain decimals only, up to 12 digits on each side of the point.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- Loading state -->
+    <section id="view-loading" class="view view-loading" aria-labelledby="loading-title" aria-busy="true" hidden>
+      <header class="result-head">
+        <p class="eyebrow">Comparison pending</p>
+        <h1 id="loading-title" class="loading-title" tabindex="-1">Comparing <span class="file-ref" id="loading-before"></span> with <span class="file-ref" id="loading-after"></span></h1>
+        <p class="lede" role="status">Reading both files, matching Services and checking the Reconciliation.</p>
+      </header>
+      <div class="stats skeleton-stats" aria-hidden="true">
+        <div class="stat"><span class="skel skel-label"></span><span class="skel skel-figure"></span></div>
+        <div class="stat"><span class="skel skel-label"></span><span class="skel skel-figure"></span></div>
+        <div class="stat"><span class="skel skel-label"></span><span class="skel skel-figure"></span></div>
+      </div>
+      <div class="services" aria-hidden="true">
+        <div class="table-wrap">
+          <table class="ledger skeleton-ledger">
+            <thead>
+              <tr>
+                <th class="col-service"><span class="th-static">Service</span></th>
+                <th class="col-status"><span class="th-static">Status</span></th>
+                <th class="num"><span class="th-static">Before Cost</span></th>
+                <th class="num"><span class="th-static">After Cost</span></th>
+                <th class="num"><span class="th-static">Total change</span></th>
+              </tr>
+            </thead>
+            <tbody id="skeleton-rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result state -->
+    <section id="view-result" class="view view-result" aria-labelledby="summary-heading" hidden>
+      <header class="result-head">
+        <div class="result-bar">
+          <p class="eyebrow">Comparison <span class="file-ref" id="result-files"></span></p>
+          <button type="button" class="btn btn-secondary btn-small" data-action="start-over">Start over</button>
+        </div>
+        <h1 id="summary-heading" class="summary" tabindex="-1"></h1>
+        <div id="rounding-notice" class="notice" role="note" hidden></div>
+      </header>
+
+      <section class="stats" id="stats" aria-label="Bill totals"></section>
+
+      <section class="movement" aria-labelledby="movement-title">
+        <div class="section-head">
+          <h2 id="movement-title" class="section-title">From before total to after total</h2>
+          <p class="section-help">Select a bar or a Bucket to list its Contributors.</p>
+        </div>
+        <figure class="waterfall">
+          <figcaption id="waterfall-caption" class="sr-only">Waterfall chart: before total, the four Buckets, then after total.</figcaption>
+          <div class="wf-canvas" id="waterfall-canvas"></div>
+          <p id="waterfall-desc" class="sr-only"></p>
+        </figure>
+        <div class="bucket-bar">
+          <div class="bucket-bar-head">
+            <h3 class="label" id="bucket-title">Buckets</h3>
+            <button type="button" class="btn-link" id="bucket-clear" data-action="clear-bucket" hidden>Clear selection</button>
+          </div>
+          <div class="bucket-chips" id="bucket-chips" role="group" aria-labelledby="bucket-title"></div>
+          <p class="bucket-note" id="bucket-note" hidden></p>
+        </div>
+        <div class="reconciliation" id="reconciliation"></div>
+      </section>
+
+      <section class="services" aria-labelledby="services-title">
+        <div class="section-head">
+          <h2 class="section-title" id="services-title">Services</h2>
+          <p class="section-help" id="services-meta"></p>
+        </div>
+        <div class="services-toolbar">
+          <div class="search-field">
+            <label for="service-search" class="label">Search Services</label>
+            <div class="search-box">
+              <svg class="od-icon search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="7" cy="7" r="4.25"/><path d="m10.25 10.25 3.25 3.25"/></svg>
+              <input id="service-search" type="search" autocomplete="off" spellcheck="false" placeholder="Service name">
+            </div>
+          </div>
+          <div class="status-field">
+            <p class="label" id="status-label">Status</p>
+            <div class="segmented" role="group" aria-labelledby="status-label">
+              <button type="button" data-status="all" aria-pressed="true"><span class="seg-label">All</span><span class="seg-count" data-count></span></button>
+              <button type="button" data-status="added" aria-pressed="false"><span class="seg-label">Added</span><span class="seg-count" data-count></span></button>
+              <button type="button" data-status="removed" aria-pressed="false"><span class="seg-label">Removed</span><span class="seg-count" data-count></span></button>
+              <button type="button" data-status="changed" aria-pressed="false"><span class="seg-label">Changed</span><span class="seg-count" data-count></span></button>
+              <button type="button" data-status="unchanged" aria-pressed="false"><span class="seg-label">Unchanged</span><span class="seg-count" data-count></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="bucket-filter" id="bucket-filter" hidden>
+          <p class="bucket-filter-text" id="bucket-filter-text"></p>
+          <button type="button" class="btn-link" data-action="clear-bucket">Clear</button>
+        </div>
+        <div class="table-wrap" id="table-wrap">
+          <table class="ledger" id="ledger">
+            <caption class="sr-only">Services in both bills. Each row expands to show its Source lines and worked formula.</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="col-service" data-col="service">
+                  <button type="button" class="sort-btn" data-sort="service"><span class="sort-text"><span class="sort-name">Service</span></span><span class="sort-icon" aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" class="col-status" data-col="status">
+                  <button type="button" class="sort-btn" data-sort="status"><span class="sort-text"><span class="sort-name">Status</span></span><span class="sort-icon" aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" class="num" data-col="before">
+                  <button type="button" class="sort-btn" data-sort="before"><span class="sort-text"><span class="sort-name">Before Cost</span></span><span class="sort-icon" aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" class="num" data-col="after">
+                  <button type="button" class="sort-btn" data-sort="after"><span class="sort-text"><span class="sort-name">After Cost</span></span><span class="sort-icon" aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" class="num col-change" data-col="change">
+                  <button type="button" class="sort-btn" data-sort="change"><span class="sort-text"><span class="sort-name" id="change-col-name">Total change</span><span class="sort-sub" id="change-col-sub" hidden></span></span><span class="sort-icon" aria-hidden="true"></span></button>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="ledger-body"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="ledger-empty" hidden>
+          <p class="empty-title">No Services match</p>
+          <p class="empty-body" id="ledger-empty-body"></p>
+          <button type="button" class="btn btn-secondary btn-small" id="ledger-empty-clear" data-action="clear-filters">Clear filters</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- Error state -->
+    <section id="view-error" class="view view-error" aria-labelledby="error-title" hidden>
+      <header class="result-head">
+        <p class="eyebrow">Comparison not possible</p>
+        <h1 id="error-title" class="error-title" tabindex="-1"></h1>
+        <p class="lede" id="error-lede"></p>
+      </header>
+      <div id="error-groups" class="error-groups"></div>
+      <div class="action-row error-actions">
+        <button type="button" class="btn btn-primary" data-action="back-to-upload">Back to upload</button>
+        <button type="button" class="btn btn-secondary" data-action="start-over">Start over</button>
+      </div>
+    </section>
+  </main>
+
+  <p id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+
+  <script src="exact.js"></script>
+  <script src="demos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
