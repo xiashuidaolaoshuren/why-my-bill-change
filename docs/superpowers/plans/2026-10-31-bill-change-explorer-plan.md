@@ -113,12 +113,12 @@ Errors are 400 `{ "errors": [{ "file": "before" | "after", "line": number | null
 
 1. **writing-plans** produced this file (type-1 decomposition).
 2. Per subtask: **Plan mode** + **planning-subtasks** → a type-2 plan when **Plan mode** is `high`.
-3. **Agent mode**: **test-driven-development** when **`TDD suitable: yes`** (or the TDD slice of **`partial`**). Follow **Verification** when **`no`**.
+3. **Agent mode**: **test-driven-development** when `TDD suitable: yes` (or the TDD slice of `partial`). Follow **Verification** when `no`.
 4. Equivalent internal changes: record and continue. A subtask split updates ids, **Consumes** / **Produces**, and **Blocked by**. A material change (this JSON, a dependency, verification): pause and confirm.
 
 ## Subtasks
 
-Notation: `Blocked by: B2` means start after B2 is done. Subtask ids are **`B*`** (backend slice) and **`F*`** (frontend slice).
+Notation: `Blocked by: B2` means start after B2 is done. Subtask ids are `B*` (backend slice) and `F*` (frontend slice).
 
 When a slice is complete, every item in **Slice acceptance (checklist)** for that slice must hold.
 
@@ -128,7 +128,8 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### B1 — Scaffold and money
 
-- [ ] **Do:** Create the Next.js + TypeScript app, Vitest, and `src/core/` with no Next or React imports. Implement `money.ts`: decimal.js (precision ≥ 80), exact strings without exponent, display strings with `HK$`, thousands separators, and `ROUND_HALF_UP` to cents.
+- [x] **Do:** Create the Next.js + TypeScript app, Vitest, and `src/core/` with no Next or React imports. Implement `money.ts`: decimal.js (precision ≥ 80), exact strings without exponent, display strings with `HK$`, thousands separators, and `ROUND_HALF_UP` to cents.
+
 - **Consumes:** spec sections 4–5 for numeric limits and display rules. `CONTEXT.md` for naming.
 - **Produces:** `package.json`, `tsconfig.json`, `next.config.ts`, `vitest.config.ts`, `src/core/money.ts`, a minimal `src/app/layout.tsx` placeholder if needed for the toolchain, and tests for display rounding (`0.005` → `HK$0.01`, `-0.005` → `-HK$0.01`).
 - **Acceptance:** `npm run typecheck` passes. Money tests pass. `src/core` contains no `parseFloat` and no `Number(`.
@@ -140,7 +141,8 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### B2 — Parse and validate
 
-- [ ] **Do:** Implement `parse.ts` and `validate.ts` per spec section 4. Collect recoverable errors across both bills; fatal errors stop further validation of that file only. Enforce 1 MB and 10,000 data rows before parse.
+- [x] **Do:** Implement `parse.ts` and `validate.ts` per spec section 4. Collect recoverable errors across both bills; fatal errors stop further validation of that file only. Enforce 1 MB and 10,000 data rows before parse.
+
 - **Consumes:** B1 money types for parsed decimals. Spec section 4 error shape: `{ file, line, column, message }`.
 - **Produces:** `parseCsv(text)`, `validateBill({ side, fileName, text })` returning `{ services, errors }`.
 - **Acceptance:** One failing test per validation rule, each asserting file, line, and column. Rules covered: header trim and case-insensitivity; extra columns ignored; duplicate required header (file-level); missing header; empty file; header-only accepted (zero cost); blank service; duplicate service on the later source line; quantity and unit_price plain non-negative decimals (no symbol, separators, plus, exponent); >12 integer or >12 fractional digits; >1 MB; >10,000 data rows; unclosed quote / fatal parse (no invented cell errors); other file still validated; file-level errors use null line and column.
@@ -152,7 +154,8 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### B3 — Compare, summary, and response
 
-- [ ] **Do:** Implement `compare.ts`, `summary.ts`, and `present.ts`. Hand-write golden fixtures **before** implementation code. Add property tests (Vitest + fast-check). Map the internal comparison to the JSON contract (including `summaryParts` and `displayRoundingNotice`).
+- [x] **Do:** Implement `compare.ts`, `summary.ts`, and `present.ts`. Hand-write golden fixtures **before** implementation code. Add property tests (Vitest + fast-check). Map the internal comparison to the JSON contract (including `summaryParts` and `displayRoundingNotice`).
+
 - **Consumes:** B2 validated bills. B1 money. Spec section 5 formulas and invariants.
 - **Produces:** `compareBills(before, after)`, `buildSummary(...)`, `displayRoundingNotice(...)`, `toCompareResponse(...)`, and `tests/fixtures/<case>/` for every case in **Appendix A**.
 - **Acceptance:** All golden fixtures match hand-calculated `expected.json`. Headline case matches section 10 numbers and summary sentence exactly. Property tests: reconciliation identity; changed-row usage + price = change; contributor = non-zero exact effect; row order invariant; swap bills negates total change. Reconciliation failure throws (becomes 500 at route). Summary grammar per **Appendix B**. `displayRoundingNotice` fields match prototype semantics.
@@ -164,7 +167,8 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### B4 — Compare API and samples
 
-- [ ] **Do:** Thin `POST /api/compare` route: multipart `before` and `after`, call core, map errors to 400 and reconciliation failure to 500. Add `samples/before.csv`, `samples/after.csv`, `samples/invalid-before.csv`. API tests for headline success and invalid before file.
+- [x] **Do:** Thin `POST /api/compare` route: multipart `before` and `after`, call core, map errors to 400 and reconciliation failure to 500. Add `samples/before.csv`, `samples/after.csv`, `samples/invalid-before.csv`. API tests for headline success and invalid before file.
+
 - **Consumes:** B3 `toCompareResponse` and validation errors. Contract above.
 - **Produces:** `src/app/api/compare/route.ts`, the three sample files, route-level tests.
 - **Acceptance:** Headline pair returns 200 with filenames and source lines on rows. Invalid sample against headline after returns 400 only: line 3 `unit_price`, line 5 duplicate `Support`; no success body. Logs may include status, row counts, duration, error category; never file contents, names, service names, quantities, prices, or costs.
@@ -183,6 +187,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 #### F1 — Shell, tokens, and page states
 
 - [ ] **Do:** shadcn/ui init, Tailwind, editorial-ledger tokens from `prototype/styles.css`, `layout.tsx`, `globals.css`, and `page.tsx` with four views (upload, pending, result, error) wired but empty of data UI.
+
 - **Consumes:** section 8 design direction. B1 Next app (same repo).
 - **Produces:** routable `/` with hidden/shown views and skip link; no compare logic yet.
 - **Acceptance:** Page loads. Tokens match paper/ink/accent/red/green and font pairing. `prefers-reduced-motion` respected in CSS variables or media queries.
@@ -195,7 +200,8 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F2 — Upload, samples, and pending
 
-- [ ] **Do:** `upload.tsx`: two drop zones, drag-and-drop, remove, disabled Compare until both files, `Use sample files` (fetches `samples/*`), submit calls `POST /api/compare`. Clear previous result/errors on submit. Pending ≥280ms with skeleton in table area.
+- [ ] **Do:** `upload.tsx`: two drop zones, drag-and-drop, remove, disabled Compare until both files, `Use sample files` (fetches `samples/`*), submit calls `POST /api/compare`. Clear previous result/errors on submit. Pending ≥280ms with skeleton in table area.
+
 - **Consumes:** B4 API. `samples/before.csv` and `samples/after.csv`.
 - **Produces:** working upload → pending → result or error transition.
 - **Acceptance:** Headline samples load in one click. Compare disabled until both bills. Failed compare removes prior chart entirely. Pending not a fake spinner over instant data beyond the minimum wait.
@@ -209,6 +215,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 #### F3 — Headline, stats, notice, reconciliation
 
 - [ ] **Do:** `headline.tsx`: render `summary` / `summaryParts` (underlined tone amounts, not interactive), `displayRoundingNotice` copy from prototype, three stat cards with conditional `Exact …` line, reconciliation block with exact values.
+
 - **Consumes:** JSON contract. F2 result state.
 - **Produces:** result header region complete except chart and table.
 - **Acceptance:** Summary is largest type on page. Notice sentences match prototype when notice non-null. Stats show direction label on total change.
@@ -222,6 +229,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 #### F4 — Waterfall and bucket selection
 
 - [ ] **Do:** `waterfall.tsx` (Recharts) and `bucket-selector.tsx`. Column layout when canvas ≥600px and labels fit; else horizontal rows. Bar/chip click selects bucket; Clear deselects. Empty buckets: flat step, no chip.
+
 - **Consumes:** F3 result layout. Section 8 chart rules.
 - **Produces:** linked selection state consumed by F5.
 - **Acceptance:** Order before → added → usage → price → removed → after. Red/green with sign. Zero-total bucket with contributors remains selectable. ARIA: chart described as image with text summary of steps.
@@ -235,6 +243,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 #### F5 — Services table, exact sort, and errors
 
 - [ ] **Do:** `compareExact.ts` + tests. `services-table.tsx`: search, status segments with counts, sort via `compareExact`, bucket filter from F4, expand row with source lines and worked formulas from display strings. `errors.tsx`: grouped by file. Empty filter state with clear action. Sticky header; service column pinned on narrow screens.
+
 - **Consumes:** F4 selection. API rows and errors shape.
 - **Produces:** `src/lib/exact-order.ts`, table and error components.
 - **Acceptance:** `compareExact` orders `"-20" < "0" < "0.004" < "0.01" < "10" < "240"`; `1.0` equals `1.00`. Bucket selected → contribution column, abs sort. Expand shows e.g. `(160 − 100) × HK$1.00 = HK$60.00`. Errors: line, column, message; no chart left.
@@ -248,6 +257,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 #### F6 — Playwright, Docker, CI, and docs
 
 - [ ] **Do:** `tests/e2e/headline.spec.ts`, Dockerfile, `.github/workflows/ci.yml` (typecheck, lint, unit tests, e2e, docker build, core grep), `README.md`, `docs/AI_WORKFLOW.md`.
+
 - **Consumes:** full app from F1–F5. Spec section 10 deliverables.
 - **Produces:** reviewer-runnable image and docs.
 - **Acceptance:** Playwright: headline samples → summary HK$240.00 → select Added → Support visible, Compute hidden → expand Support → after.csv line 4 HK$180.00 → invalid before → errors, chart gone. `docker build` && `docker run` serves app. README and AI_WORKFLOW complete per spec.
