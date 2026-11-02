@@ -1,0 +1,49 @@
+{
+  "currency": "HKD",
+  "totals": {
+    "before": { "exact": "20", "display": "HK$20.00" },
+    "after": { "exact": "20", "display": "HK$20.00" },
+    "change": { "exact": "0", "display": "HK$0.00" }
+  },
+  "buckets": {
+    "added": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "usage": { "exact": "-10", "display": "-HK$10.00", "contributors": 1 },
+    "price": { "exact": "10", "display": "HK$10.00", "contributors": 1 },
+    "removed": { "exact": "0", "display": "HK$0.00", "contributors": 0 }
+  },
+  "summary": "Total did not change: HK$10.00 from price changes exactly offset HK$10.00 from usage changes.",
+  "summaryParts": [
+    { "type": "text", "text": "Total did not change: " },
+    { "type": "amount", "text": "HK$10.00", "tone": "up" },
+    { "type": "text", "text": " from price changes" },
+    { "type": "text", "text": " exactly offset " },
+    { "type": "amount", "text": "HK$10.00", "tone": "down" },
+    { "type": "text", "text": " from usage changes" },
+    { "type": "text", "text": "." }
+  ],
+  "displayRoundingNotice": null,
+  "rows": [
+    {
+      "service": "Widget",
+      "status": "changed",
+      "buckets": ["usage", "price"],
+      "before": {
+        "quantity": { "exact": "10", "display": "10" },
+        "unitPrice": { "exact": "2", "display": "HK$2.00" },
+        "cost": { "exact": "20", "display": "HK$20.00" }
+      },
+      "after": {
+        "quantity": { "exact": "5", "display": "5" },
+        "unitPrice": { "exact": "4", "display": "HK$4.00" },
+        "cost": { "exact": "20", "display": "HK$20.00" }
+      },
+      "sources": {
+        "before": { "fileName": "before.csv", "line": 2 },
+        "after": { "fileName": "after.csv", "line": 2 }
+      },
+      "usageEffect": { "exact": "-10", "display": "-HK$10.00" },
+      "priceEffect": { "exact": "10", "display": "HK$10.00" },
+      "change": { "exact": "0", "display": "HK$0.00" }
+    }
+  ]
+}

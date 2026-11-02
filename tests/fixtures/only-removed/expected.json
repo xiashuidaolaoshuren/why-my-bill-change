@@ -1,0 +1,44 @@
+{
+  "currency": "HKD",
+  "totals": {
+    "before": { "exact": "20", "display": "HK$20.00" },
+    "after": { "exact": "0", "display": "HK$0.00" },
+    "change": { "exact": "-20", "display": "-HK$20.00" }
+  },
+  "buckets": {
+    "added": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "usage": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "price": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "removed": { "exact": "-20", "display": "-HK$20.00", "contributors": 1 }
+  },
+  "summary": "Total decreased by HK$20.00: HK$20.00 from removed services.",
+  "summaryParts": [
+    { "type": "text", "text": "Total decreased by " },
+    { "type": "amount", "text": "HK$20.00", "tone": "down" },
+    { "type": "text", "text": ": " },
+    { "type": "amount", "text": "HK$20.00", "tone": "down" },
+    { "type": "text", "text": " from removed services" },
+    { "type": "text", "text": "." }
+  ],
+  "displayRoundingNotice": null,
+  "rows": [
+    {
+      "service": "Legacy",
+      "status": "removed",
+      "buckets": ["removed"],
+      "before": {
+        "quantity": { "exact": "20", "display": "20" },
+        "unitPrice": { "exact": "1", "display": "HK$1.00" },
+        "cost": { "exact": "20", "display": "HK$20.00" }
+      },
+      "after": null,
+      "sources": {
+        "before": { "fileName": "before.csv", "line": 2 },
+        "after": null
+      },
+      "usageEffect": { "exact": "0", "display": "HK$0.00" },
+      "priceEffect": { "exact": "0", "display": "HK$0.00" },
+      "change": { "exact": "-20", "display": "-HK$20.00" }
+    }
+  ]
+}

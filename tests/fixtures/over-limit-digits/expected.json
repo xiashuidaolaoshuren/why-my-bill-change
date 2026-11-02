@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "file": "before",
+      "line": 3,
+      "column": "quantity",
+      "message": "\"1000000000000\" has more than 12 digits before the decimal point."
+    }
+  ]
+}

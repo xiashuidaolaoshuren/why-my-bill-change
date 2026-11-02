@@ -1,0 +1,79 @@
+{
+  "currency": "HKD",
+  "totals": {
+    "before": {
+      "exact": "999999999998000000000001",
+      "display": "HK$999,999,999,998,000,000,000,001.00"
+    },
+    "after": {
+      "exact": "999999999998999999999999.000000000001",
+      "display": "HK$999,999,999,998,999,999,999,999.00"
+    },
+    "change": {
+      "exact": "999999999998.000000000001",
+      "display": "HK$999,999,999,998.00"
+    }
+  },
+  "buckets": {
+    "added": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "usage": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "price": {
+      "exact": "999999999998.000000000001",
+      "display": "HK$999,999,999,998.00",
+      "contributors": 1
+    },
+    "removed": { "exact": "0", "display": "HK$0.00", "contributors": 0 }
+  },
+  "summary": "Total increased by HK$999,999,999,998.00: HK$999,999,999,998.00 from price changes.",
+  "summaryParts": [
+    { "type": "text", "text": "Total increased by " },
+    { "type": "amount", "text": "HK$999,999,999,998.00", "tone": "up" },
+    { "type": "text", "text": ": " },
+    { "type": "amount", "text": "HK$999,999,999,998.00", "tone": "up" },
+    { "type": "text", "text": " from price changes" },
+    { "type": "text", "text": "." }
+  ],
+  "displayRoundingNotice": null,
+  "rows": [
+    {
+      "service": "Alpha",
+      "status": "changed",
+      "buckets": ["price"],
+      "before": {
+        "quantity": { "exact": "999999999999", "display": "999999999999" },
+        "unitPrice": {
+          "exact": "999999999999",
+          "display": "HK$999,999,999,999.00"
+        },
+        "cost": {
+          "exact": "999999999998000000000001",
+          "display": "HK$999,999,999,998,000,000,000,001.00"
+        }
+      },
+      "after": {
+        "quantity": { "exact": "999999999999", "display": "999999999999" },
+        "unitPrice": {
+          "exact": "999999999999.999999999999",
+          "display": "HK$1,000,000,000,000.00"
+        },
+        "cost": {
+          "exact": "999999999998999999999999.000000000001",
+          "display": "HK$999,999,999,998,999,999,999,999.00"
+        }
+      },
+      "sources": {
+        "before": { "fileName": "before.csv", "line": 2 },
+        "after": { "fileName": "after.csv", "line": 2 }
+      },
+      "usageEffect": { "exact": "0", "display": "HK$0.00" },
+      "priceEffect": {
+        "exact": "999999999998.000000000001",
+        "display": "HK$999,999,999,998.00"
+      },
+      "change": {
+        "exact": "999999999998.000000000001",
+        "display": "HK$999,999,999,998.00"
+      }
+    }
+  ]
+}

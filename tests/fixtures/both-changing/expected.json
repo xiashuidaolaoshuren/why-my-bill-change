@@ -1,0 +1,51 @@
+{
+  "currency": "HKD",
+  "totals": {
+    "before": { "exact": "10", "display": "HK$10.00" },
+    "after": { "exact": "14.4", "display": "HK$14.40" },
+    "change": { "exact": "4.4", "display": "HK$4.40" }
+  },
+  "buckets": {
+    "added": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
+    "usage": { "exact": "2", "display": "HK$2.00", "contributors": 1 },
+    "price": { "exact": "2.4", "display": "HK$2.40", "contributors": 1 },
+    "removed": { "exact": "0", "display": "HK$0.00", "contributors": 0 }
+  },
+  "summary": "Total increased by HK$4.40: HK$2.00 from usage changes and HK$2.40 from price changes.",
+  "summaryParts": [
+    { "type": "text", "text": "Total increased by " },
+    { "type": "amount", "text": "HK$4.40", "tone": "up" },
+    { "type": "text", "text": ": " },
+    { "type": "amount", "text": "HK$2.00", "tone": "up" },
+    { "type": "text", "text": " from usage changes" },
+    { "type": "text", "text": " and " },
+    { "type": "amount", "text": "HK$2.40", "tone": "up" },
+    { "type": "text", "text": " from price changes" },
+    { "type": "text", "text": "." }
+  ],
+  "displayRoundingNotice": null,
+  "rows": [
+    {
+      "service": "Compute",
+      "status": "changed",
+      "buckets": ["usage", "price"],
+      "before": {
+        "quantity": { "exact": "100", "display": "100" },
+        "unitPrice": { "exact": "0.1", "display": "HK$0.10" },
+        "cost": { "exact": "10", "display": "HK$10.00" }
+      },
+      "after": {
+        "quantity": { "exact": "120", "display": "120" },
+        "unitPrice": { "exact": "0.12", "display": "HK$0.12" },
+        "cost": { "exact": "14.4", "display": "HK$14.40" }
+      },
+      "sources": {
+        "before": { "fileName": "before.csv", "line": 2 },
+        "after": { "fileName": "after.csv", "line": 2 }
+      },
+      "usageEffect": { "exact": "2", "display": "HK$2.00" },
+      "priceEffect": { "exact": "2.4", "display": "HK$2.40" },
+      "change": { "exact": "4.4", "display": "HK$4.40" }
+    }
+  ]
+}
