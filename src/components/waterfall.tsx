@@ -9,7 +9,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { isCentExact, toneOfExact } from "@/components/headline";
+import { exactText, isCentExact, toneOfExact } from "@/components/headline";
 import { BUCKET_KEYS, type BucketKey } from "@/core/compare";
 import type { CompareResponse, MoneyJson } from "@/core/present";
 import type { Tone } from "@/core/summary";
@@ -304,7 +304,7 @@ function TooltipBody({
 }) {
   const rows: Array<{ key: string; value: string }> = [
     { key: "Displayed", value: step.value.display },
-    { key: "Exact", value: step.value.exact },
+    { key: "Exact", value: exactText(step.value) },
   ];
 
   let foot: string;

@@ -62,6 +62,13 @@ export function toneOfExact(exact: string): Tone {
   return exact.startsWith("-") ? "down" : "up";
 }
 
+/** Currency-prefixed exact text: `HK$170`, `-HK$0.004`. No separators, no rounding. */
+export function exactText(value: MoneyJson): string {
+  return value.exact.startsWith("-")
+    ? `-HK$${value.exact.slice(1)}`
+    : `HK$${value.exact}`;
+}
+
 const DIRECTION_LABEL: Record<Tone, string> = {
   up: "Bill increased",
   down: "Bill decreased",
@@ -148,7 +155,9 @@ function StatCard({
         <span>{value.display}</span>
       </p>
       <p className="stat-meta">{meta}</p>
-      {isCentExact(value) ? null : <p className="stat-exact">Exact {value.exact}</p>}
+      {isCentExact(value) ? null : (
+        <p className="stat-exact">Exact {exactText(value)}</p>
+      )}
     </div>
   );
 }
@@ -187,9 +196,9 @@ export function Stats({
 }
 
 export function Reconciliation({ result }: { result: CompareResponse }) {
-  const spoken = `Before total ${result.totals.before.exact}, ${BUCKETS.map(
-    (bucket) => `${bucket.label} ${result.buckets[bucket.key].exact}`,
-  ).join(", ")}, equals after total ${result.totals.after.exact}.`;
+  const spoken = `Before total ${exactText(result.totals.before)}, ${BUCKETS.map(
+    (bucket) => `${bucket.label} ${exactText(result.buckets[bucket.key])}`,
+  ).join(", ")}, equals after total ${exactText(result.totals.after)}.`;
 
   return (
     <section className="reconciliation" aria-label="Reconciliation, exact values">
@@ -197,7 +206,7 @@ export function Reconciliation({ result }: { result: CompareResponse }) {
       <p className="rec-equation" aria-label={spoken}>
         <span className="rec-term">
           <span className="rec-name">Before total</span>
-          <span className="rec-value">{result.totals.before.exact}</span>
+          <span className="rec-value">{exactText(result.totals.before)}</span>
         </span>
         {BUCKETS.map((bucket) => (
           <Fragment key={bucket.key}>
@@ -206,7 +215,9 @@ export function Reconciliation({ result }: { result: CompareResponse }) {
             </span>
             <span className="rec-term">
               <span className="rec-name">{bucket.label}</span>
-              <span className="rec-value">{result.buckets[bucket.key].exact}</span>
+              <span className="rec-value">
+                {exactText(result.buckets[bucket.key])}
+              </span>
             </span>
           </Fragment>
         ))}
@@ -215,7 +226,7 @@ export function Reconciliation({ result }: { result: CompareResponse }) {
         </span>
         <span className="rec-term">
           <span className="rec-name">After total</span>
-          <span className="rec-value">{result.totals.after.exact}</span>
+          <span className="rec-value">{exactText(result.totals.after)}</span>
         </span>
       </p>
       <p className="rec-status">

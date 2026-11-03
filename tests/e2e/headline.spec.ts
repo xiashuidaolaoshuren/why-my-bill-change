@@ -43,6 +43,10 @@ test("headline sample: summary, Bucket filter, expanded row, clear", async ({
   const problems = trackProblems(page);
   await loadHeadlineSample(page);
 
+  // The reconciliation is stated in exact, currency-prefixed values.
+  await expect(page.locator(".rec-value").first()).toHaveText("HK$170");
+  await expect(page.locator(".rec-value").last()).toHaveText("HK$410");
+
   // Default order is the largest increase first.
   await expect(serviceNames(page)).toHaveText([
     "Support",
@@ -100,7 +104,12 @@ test("invalid sample: grouped errors and no chart", async ({ page }) => {
   await page.getByRole("button", { name: /Invalid/ }).click();
 
   await expect(page.locator("#view-error")).toBeVisible();
-  await expect(page.locator("#error-title")).toContainText("issue");
+  await expect(page.locator("#error-title")).toHaveText(
+    "2 problems stop this Comparison",
+  );
+  await expect(page.locator("#view-error .lede")).toContainText(
+    "Fix invalid-before.csv, then compare again.",
+  );
 
   const groups = page.locator(".error-group");
   await expect(groups).toHaveCount(2);
@@ -112,11 +121,16 @@ test("invalid sample: grouped errors and no chart", async ({ page }) => {
   await expect(groups.first()).toContainText("2 problems");
   await expect(groups.last()).toContainText("No problems found");
 
-  const errorItems = groups.first().locator(".validation-errors li");
-  await expect(errorItems.first()).toContainText("line 3");
-  await expect(errorItems.first()).toContainText("unit_price");
-  await expect(errorItems.last()).toContainText("line 4");
-  await expect(errorItems.last()).toContainText("Duplicate Service");
+  const errorRows = groups.first().locator(".error-table tbody tr");
+  await expect(errorRows).toHaveCount(2);
+  await expect(errorRows.first().locator(".err-line")).toHaveText("3");
+  await expect(errorRows.first().locator(".err-col code")).toHaveText(
+    "unit_price",
+  );
+  await expect(errorRows.last().locator(".err-line")).toHaveText("5");
+  await expect(errorRows.last().locator(".err-msg")).toContainText(
+    "Duplicate Service",
+  );
 
   // The previous Comparison is gone, not merely hidden.
   await expect(page.locator("#view-result .waterfall")).toHaveCount(0);

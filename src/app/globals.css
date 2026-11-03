@@ -1008,20 +1008,6 @@ button.wf-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 
   to { opacity: 1; }
 }
 
-.validation-errors {
-  display: grid;
-  gap: var(--s-2);
-  padding-block: var(--s-4);
-  font-size: var(--fs-small);
-  line-height: 1.55;
-}
-
-.validation-errors li { padding-bottom: var(--s-2); border-bottom: 1px solid var(--rule); }
-
-.validation-errors-group {
-  padding-block: 0;
-}
-
 /* ---------- Services table ---------- */
 
 .services-toolbar {
@@ -1344,6 +1330,14 @@ button.wf-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 
 .formula-note { font-size: var(--fs-small); color: var(--ink-muted); }
 
+/* Currency-prefixed exact value beside a rounded one, e.g. "exact HK$0.004". */
+.exact {
+  font-family: var(--font-figure);
+  font-size: var(--fs-label);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+
 .empty-state {
   display: grid;
   justify-items: start;
@@ -1387,6 +1381,67 @@ button.wf-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 
 .error-group.is-clean .error-count { color: var(--ink-2); font-weight: 500; }
 .error-count .od-icon { --od-icon-size: 16px; }
+
+/* One row per problem: source line, column, message. */
+.error-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: var(--fs-small);
+}
+
+.error-table th {
+  padding: var(--s-2) var(--s-3) var(--s-2) 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.error-table th:nth-child(1) { width: 120px; }
+.error-table th:nth-child(2) { width: 132px; }
+
+.error-table td {
+  padding: var(--s-3) var(--s-3) var(--s-3) 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.err-line {
+  font-family: var(--font-figure);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.err-col code { font-size: var(--fs-small); }
+
+.err-msg-body { display: grid; gap: var(--s-1); }
+.err-msg-body > * { display: block; }
+.err-msg-body p { color: var(--ink); line-height: 1.5; overflow-wrap: anywhere; }
+
+@media (max-width: 560px) {
+  .error-table thead { display: none; }
+  .error-table,
+  .error-table tbody,
+  .error-table tr,
+  .error-table td { display: block; width: 100%; }
+  .error-table tr { padding-block: var(--s-3); border-bottom: 1px solid var(--rule); }
+  .error-table td { padding: 2px 0; border: 0; }
+  .error-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--font-text);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .error-table td.err-msg::before { display: none; }
+}
 
 .failure-message {
   padding-block: var(--s-4);

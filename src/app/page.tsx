@@ -29,6 +29,8 @@ type View = "upload" | "loading" | "result" | "error";
 
 const VIEW_ORDER: readonly View[] = ["upload", "loading", "result", "error"];
 
+const SIDES: readonly BillSide[] = ["before", "after"];
+
 const MIN_PENDING_MS = 280;
 
 const FAILURE_MESSAGE =
@@ -52,6 +54,12 @@ const BUCKET_LABELS: Record<BucketKey, string> = {
 
 function plural(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+function joinList(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 }
 
 function isView(value: string | null): value is View {
@@ -313,12 +321,25 @@ export default function Home() {
   };
 
   const errorCount = errors?.length ?? 0;
-  const errorTitle =
-    failure && errorCount === 0
-      ? "The comparison could not be completed"
+  const failureOnly = Boolean(failure) && errorCount === 0;
+
+  const errorTitle = failureOnly
+    ? "The comparison could not be completed"
+    : errorCount === 0
+      ? ""
       : errorCount === 1
-        ? "1 issue blocked the comparison"
-        : `${errorCount} issues blocked the comparison`;
+        ? "One problem stops this Comparison"
+        : `${errorCount} problems stop this Comparison`;
+
+  const failingFiles = errors
+    ? SIDES.filter((side) => errors.some((entry) => entry.file === side))
+    : [];
+  const fixTargets = failingFiles.map((side) => comparedNames[side]);
+  const errorLede = failureOnly
+    ? (failure ?? "")
+    : errorCount === 0
+      ? ""
+      : `${fixTargets.length > 0 ? `Fix ${joinList(fixTargets)}, then compare again. ` : ""}No totals, Buckets or chart are shown until both bills are valid.`;
 
   return (
     <>
@@ -459,10 +480,9 @@ export default function Home() {
           <header className="result-head">
             <div className="result-bar">
               <p className="eyebrow">
-                Comparison
+                Comparison{" "}
                 {resultBefore && resultAfter ? (
                   <>
-                    {" · "}
                     <span className="file-ref">{resultBefore}</span>
                     {" → "}
                     <span className="file-ref">{resultAfter}</span>
@@ -546,11 +566,7 @@ export default function Home() {
             >
               {errorTitle}
             </h1>
-            <p className="lede">
-              {failure && errorCount === 0
-                ? failure
-                : "Fix the rows listed below, then compare the bills again."}
-            </p>
+            <p className="lede">{errorLede}</p>
           </header>
 
           {failure && errorCount > 0 ? (

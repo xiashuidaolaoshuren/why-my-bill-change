@@ -86,22 +86,36 @@ export function ValidationErrors({
                 <span>{plural(sorted.length, "problem")}</span>
               </p>
             </div>
-            <ul className="validation-errors validation-errors-group">
-              {sorted.map((entry, index) => (
-                <li
-                  key={`${entry.file}-${entry.line}-${entry.column}-${index}`}
-                >
-                  {entry.line !== null ? (
-                    <>
-                      line {entry.line}
-                      {entry.column ? ` · ${entry.column}` : ""}
-                      {" — "}
-                    </>
-                  ) : null}
-                  {entry.message}
-                </li>
-              ))}
-            </ul>
+            <table className="error-table">
+              <thead>
+                <tr>
+                  <th scope="col">Source line</th>
+                  <th scope="col">Column</th>
+                  <th scope="col">Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((entry, index) => (
+                  <tr key={`${entry.file}-${entry.line}-${entry.column}-${index}`}>
+                    <td className="err-line" data-label="Source line">
+                      {entry.line ?? "Whole file"}
+                    </td>
+                    <td className="err-col" data-label="Column">
+                      {entry.column ? (
+                        <code>{entry.column}</code>
+                      ) : (
+                        <span aria-label="No column">—</span>
+                      )}
+                    </td>
+                    <td className="err-msg" data-label="Message">
+                      <div className="err-msg-body">
+                        <p>{entry.message}</p>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </section>
         );
       })}

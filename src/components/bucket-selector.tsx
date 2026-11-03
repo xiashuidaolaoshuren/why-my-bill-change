@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { isCentExact, toneOfExact } from "@/components/headline";
+import { exactText, isCentExact, toneOfExact } from "@/components/headline";
 import { BUCKET_KEYS, type BucketKey } from "@/core/compare";
 import type { CompareResponse } from "@/core/present";
 import type { Tone } from "@/core/summary";
@@ -99,7 +99,7 @@ export function BucketSelector({
             const tone = toneOfExact(bucket.exact);
             const exactTitle = isCentExact(bucket)
               ? undefined
-              : `Exact ${bucket.exact}`;
+              : `Exact ${exactText(bucket)}`;
             return (
               <button
                 key={key}

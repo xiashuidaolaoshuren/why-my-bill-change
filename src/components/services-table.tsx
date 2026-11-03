@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { isCentExact, toneOfExact } from "@/components/headline";
+import { exactText, isCentExact, toneOfExact } from "@/components/headline";
 import type { BucketKey } from "@/core/compare";
 import type { CompareResponse, MoneyJson, RowJson, RowSideJson } from "@/core/present";
 import {
@@ -103,11 +103,6 @@ function joinList(items: string[]): string {
   if (items.length === 1) return items[0];
   if (items.length === 2) return `${items[0]} and ${items[1]}`;
   return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
-}
-
-function exactText(value: MoneyJson): string {
-  const ex = value.exact;
-  return ex.startsWith("-") ? `-HK$${ex.slice(1)}` : `HK$${ex}`;
 }
 
 function rowDomId(service: string): string {
