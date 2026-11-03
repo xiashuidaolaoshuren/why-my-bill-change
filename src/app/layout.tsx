@@ -36,7 +36,7 @@ export default function RootLayout({
           <div className="wrap topbar-inner">
             <p className="wordmark">Why did my bill change?</p>
             <p className="topbar-meta">
-              Amounts in Hong Kong dollars · Files stay in this browser
+              Amounts in Hong Kong dollars · Files are not stored
             </p>
           </div>
         </header>

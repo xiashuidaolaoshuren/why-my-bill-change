@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, lint, tests, e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Guard money code against floating point
+        run: npm run check:core
+
+      - name: Unit and property tests
+        run: npm test
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end test
+        run: npm run e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  docker:
+    name: Docker image serves the app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t why-my-bill-change .
+
+      - name: Run image and check the app
+        run: |
+          docker run -d --name app -p 3000:3000 why-my-bill-change
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://localhost:3000/ | grep -q "Why did my bill change?"
+          curl -fsS http://localhost:3000/samples/before.csv | head -n 1 | grep -q "service,quantity,unit_price"
+          curl -fsS \
+            -F "before=@samples/before.csv;type=text/csv" \
+            -F "after=@samples/after.csv;type=text/csv" \
+            http://localhost:3000/api/compare \
+            | grep -q "HK\$240.00"
+
+      - name: Container logs
+        if: failure()
+        run: docker logs app
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f app

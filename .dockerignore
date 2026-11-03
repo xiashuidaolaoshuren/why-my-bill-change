@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.github
+prototype
+tests
+docs
+coverage
+playwright-report
+test-results
+.agents
+*.tsbuildinfo

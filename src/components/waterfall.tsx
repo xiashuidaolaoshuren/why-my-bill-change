@@ -187,7 +187,7 @@ type RowLayout = {
 };
 
 function layoutColumns(steps: ChartStep[], width: number): ColumnLayout {
-  const { padX, top, plotHeight, bottom, stagger: _stagger } = CHART;
+  const { padX, top, plotHeight, bottom } = CHART;
   const height = top + plotHeight + bottom;
   const { lo, hi } = chartDomain(steps);
   const band = (width - padX * 2) / steps.length;
@@ -367,11 +367,17 @@ export function Waterfall({
   }, [mode, steps, width]);
 
   useEffect(() => {
-    setEntering(true);
-    const frame = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => setEntering(false));
+    // The chart animates on mount and whenever a new Comparison arrives: start
+    // without the transition, then flip the flag after the first paint.
+    let exit = 0;
+    const enter = window.requestAnimationFrame(() => {
+      setEntering(true);
+      exit = window.requestAnimationFrame(() => setEntering(false));
     });
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(enter);
+      window.cancelAnimationFrame(exit);
+    };
   }, [result.summary]);
 
   useEffect(() => {

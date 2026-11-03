@@ -256,7 +256,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F6 — Playwright, Docker, CI, and docs
 
-- [ ] **Do:** `tests/e2e/headline.spec.ts`, Dockerfile, `.github/workflows/ci.yml` (typecheck, lint, unit tests, e2e, docker build, core grep), `README.md`, `docs/AI_WORKFLOW.md`.
+- [x] **Do:** `tests/e2e/headline.spec.ts`, Dockerfile, `.github/workflows/ci.yml` (typecheck, lint, unit tests, e2e, docker build, core grep), `README.md`, `docs/AI_WORKFLOW.md`.
 
 - **Consumes:** full app from F1–F5. Spec section 10 deliverables.
 - **Produces:** reviewer-runnable image and docs.
@@ -316,3 +316,4 @@ Backend subtasks B1–B4: strict **test-driven-development** on each slice of lo
 | 2026-11-02 | Split T1/T2 into B1–B4 and F1–F6; appendices for fixtures and summary grammar | equivalent |
 | 2026-11-03 | F4 chart library: hand-built SVG (matches prototype), not Recharts | equivalent |
 | 2026-11-03 | F5: `exact-order.ts` + `services-view.ts`; table and grouped errors | equivalent |
+| 2026-11-03 | F6: ESLint added for the CI lint step; `output: "standalone"` for one Docker image; topbar copy corrected to "Files are not stored" now that comparison runs on the server | equivalent |

@@ -975,6 +975,10 @@ button.wf-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 
 .ledger .num { text-align: right; white-space: nowrap; }
 
+/* Screen-reader labels inside cells are absolutely positioned; without a
+   positioned cell they escape the table's scroll area and widen the page. */
+.ledger td { position: relative; }
+
 .th-static { display: block; padding: var(--s-3) var(--s-4); }
 
 .skel {

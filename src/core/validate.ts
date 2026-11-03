@@ -50,10 +50,7 @@ function isBlankRecord(fields: string[]): boolean {
   return fields.every((field) => field.trim() === "");
 }
 
-function validateDecimalText(
-  text: string,
-  column: "quantity" | "unit_price",
-): string | null {
+function validateDecimalText(text: string): string | null {
   const trimmed = text.trim();
   if (trimmed === "") {
     return "The value is empty. Enter a plain decimal such as 12 or 1.40.";
@@ -236,7 +233,7 @@ export function validateBill({
     }
 
     const quantityText = fieldAt(fields, columnIndex.quantity);
-    const quantityProblem = validateDecimalText(quantityText, "quantity");
+    const quantityProblem = validateDecimalText(quantityText);
     if (quantityProblem) {
       rowErrors.push(
         cellError(side, line, "quantity", quantityProblem),
@@ -244,7 +241,7 @@ export function validateBill({
     }
 
     const unitPriceText = fieldAt(fields, columnIndex.unit_price);
-    const unitPriceProblem = validateDecimalText(unitPriceText, "unit_price");
+    const unitPriceProblem = validateDecimalText(unitPriceText);
     if (unitPriceProblem) {
       rowErrors.push(
         cellError(side, line, "unit_price", unitPriceProblem),

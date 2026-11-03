@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BucketSelector } from "@/components/bucket-selector";
 import {
   Reconciliation,
@@ -84,12 +84,10 @@ export default function Home() {
   const runRef = useRef(0);
   const chipRefs = useRef<Partial<Record<BucketKey, HTMLButtonElement | null>>>({});
 
-  const headings = {
-    upload: useRef<HTMLHeadingElement | null>(null),
-    loading: useRef<HTMLHeadingElement | null>(null),
-    result: useRef<HTMLHeadingElement | null>(null),
-    error: useRef<HTMLHeadingElement | null>(null),
-  } satisfies Record<View, RefObject<HTMLHeadingElement | null>>;
+  const uploadHeading = useRef<HTMLHeadingElement | null>(null);
+  const loadingHeading = useRef<HTMLHeadingElement | null>(null);
+  const resultHeading = useRef<HTMLHeadingElement | null>(null);
+  const errorHeading = useRef<HTMLHeadingElement | null>(null);
 
   const presentedView = useRef<View | null>(null);
 
@@ -104,15 +102,25 @@ export default function Home() {
     if (isFirstRun) return;
     setAnnouncement(ANNOUNCEMENTS[view]);
     window.scrollTo({ top: 0 });
-    headings[view].current?.focus({ preventScroll: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const heading =
+      view === "upload"
+        ? uploadHeading
+        : view === "loading"
+          ? loadingHeading
+          : view === "result"
+            ? resultHeading
+            : errorHeading;
+    heading.current?.focus({ preventScroll: true });
   }, [view]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
     if (files.before || files.after) return;
     const requested = new URLSearchParams(window.location.search).get("view");
-    if (isView(requested)) setView(requested);
+    if (!isView(requested)) return;
+    // Deferred so the debug view never renders synchronously inside the effect.
+    const frame = window.requestAnimationFrame(() => setView(requested));
+    return () => window.cancelAnimationFrame(frame);
   }, [files.before, files.after]);
 
   const clearOutcome = useCallback(() => {
@@ -287,9 +295,9 @@ export default function Home() {
     setBusy(false);
     setView("upload");
     window.requestAnimationFrame(() => {
-      headings.upload.current?.focus({ preventScroll: true });
+      uploadHeading.current?.focus({ preventScroll: true });
     });
-  }, [clearOutcome, headings.upload]);
+  }, [clearOutcome, uploadHeading]);
 
   const loadingBefore = pendingFiles.before?.name ?? "…";
   const loadingAfter = pendingFiles.after?.name ?? "…";
@@ -325,7 +333,7 @@ export default function Home() {
             <p className="eyebrow">New Comparison</p>
             <h1
               id="upload-title"
-              ref={headings.upload}
+              ref={uploadHeading}
               className="upload-title"
               tabIndex={-1}
             >
@@ -362,7 +370,7 @@ export default function Home() {
             <p className="eyebrow">Comparison pending</p>
             <h1
               id="loading-title"
-              ref={headings.loading}
+              ref={loadingHeading}
               className="loading-title"
               tabIndex={-1}
             >
@@ -471,7 +479,7 @@ export default function Home() {
             </div>
             <h1
               id="summary-heading"
-              ref={headings.result}
+              ref={resultHeading}
               className="summary"
               tabIndex={-1}
             >
@@ -532,7 +540,7 @@ export default function Home() {
             <p className="eyebrow">Comparison not possible</p>
             <h1
               id="error-title"
-              ref={headings.error}
+              ref={errorHeading}
               className="error-title"
               tabIndex={-1}
             >

@@ -12,7 +12,6 @@ import {
 import { isCentExact, toneOfExact } from "@/components/headline";
 import type { BucketKey } from "@/core/compare";
 import type { CompareResponse, MoneyJson, RowJson, RowSideJson } from "@/core/present";
-import type { Tone } from "@/core/summary";
 import {
   contributionOf,
   defaultSort,
@@ -393,11 +392,16 @@ export function ServicesTable({
   const [sort, setSort] = useState<SortState>(() => defaultSort(bucket));
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
 
-  useEffect(() => {
+  // A new Bucket restarts the view: status back to all, the Bucket's default
+  // order, and every row collapsed. Adjusting state during render avoids an
+  // extra pass through an effect.
+  const [renderedBucket, setRenderedBucket] = useState(bucket);
+  if (renderedBucket !== bucket) {
+    setRenderedBucket(bucket);
     setStatus("all");
     setSort(defaultSort(bucket));
     setExpanded(new Set());
-  }, [bucket]);
+  }
 
   useEffect(() => {
     const wrap = tableWrapRef.current;
