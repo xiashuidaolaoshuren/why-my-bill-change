@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { BucketSelector } from "@/components/bucket-selector";
 import {
   Reconciliation,
   RoundingNotice,
@@ -8,6 +9,8 @@ import {
   SummarySentence,
 } from "@/components/headline";
 import { UploadPanel, type BillFileSlots } from "@/components/upload";
+import { Waterfall } from "@/components/waterfall";
+import type { BucketKey } from "@/core/compare";
 import type { CompareResponse } from "@/core/present";
 import type { BillSide, ValidationError } from "@/core/validate";
 import {
@@ -43,6 +46,17 @@ const ANNOUNCEMENTS: Record<View, string> = {
 
 const SKELETON_ROW_COUNT = 6;
 
+const BUCKET_LABELS: Record<BucketKey, string> = {
+  added: "Added",
+  usage: "Usage",
+  price: "Price",
+  removed: "Removed",
+};
+
+function plural(count: number, word: string): string {
+  return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
 function isView(value: string | null): value is View {
   return value !== null && (VIEW_ORDER as readonly string[]).includes(value);
 }
@@ -68,8 +82,10 @@ export default function Home() {
   const [errors, setErrors] = useState<ValidationError[] | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [bucket, setBucket] = useState<BucketKey | null>(null);
 
   const runRef = useRef(0);
+  const chipRefs = useRef<Partial<Record<BucketKey, HTMLButtonElement | null>>>({});
 
   const headings = {
     upload: useRef<HTMLHeadingElement | null>(null),
@@ -106,7 +122,37 @@ export default function Home() {
     setResult(null);
     setErrors(null);
     setFailure(null);
+    setBucket(null);
   }, []);
+
+  const selectBucket = useCallback(
+    (key: BucketKey) => {
+      setBucket((previous) => {
+        const next = previous === key ? null : key;
+        if (!result) return next;
+        const entry = result.buckets[key];
+        if (next) {
+          announce(
+            `${BUCKET_LABELS[key]} Bucket selected: ${entry.display} from ${plural(entry.contributors, "Contributor")}, largest Bucket contribution first.`,
+          );
+        } else {
+          announce("Bucket selection cleared. The table lists every Service.");
+        }
+        return next;
+      });
+    },
+    [announce, result],
+  );
+
+  const clearBucket = useCallback(() => {
+    const previous = bucket;
+    if (!previous) return;
+    setBucket(null);
+    announce("Bucket selection cleared. The table lists every Service.");
+    window.requestAnimationFrame(() => {
+      chipRefs.current[previous]?.focus({ preventScroll: true });
+    });
+  }, [announce, bucket]);
 
   const runComparison = useCallback(
     async (nextFiles: { before: File; after: File }) => {
@@ -439,7 +485,30 @@ export default function Home() {
           {result ? (
             <>
               <Stats result={result} fileNames={comparedNames} />
-              <Reconciliation result={result} />
+              <section className="movement" aria-labelledby="movement-title">
+                <div className="section-head">
+                  <h2 id="movement-title" className="section-title">
+                    From before total to after total
+                  </h2>
+                  <p className="section-help">
+                    Select a bar or a Bucket to list its Contributors.
+                  </p>
+                </div>
+                <Waterfall
+                  result={result}
+                  fileNames={comparedNames}
+                  selected={bucket}
+                  onSelect={selectBucket}
+                />
+                <BucketSelector
+                  result={result}
+                  selected={bucket}
+                  onSelect={selectBucket}
+                  onClear={clearBucket}
+                  chipRefs={chipRefs}
+                />
+                <Reconciliation result={result} />
+              </section>
             </>
           ) : null}
         </section>

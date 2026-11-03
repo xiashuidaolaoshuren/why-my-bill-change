@@ -44,7 +44,7 @@ function Icon({ name }: { name: keyof typeof ICON_PATHS }) {
 }
 
 /** The amount in `display` is rounded to the cent; `exact` may carry more digits. */
-function isCentExact(value: MoneyJson): boolean {
+export function isCentExact(value: MoneyJson): boolean {
   const strip = (text: string) => {
     const clean = text.replace("HK$", "").replace(/,/g, "");
     const [whole, fraction] = clean.split(".");
@@ -56,7 +56,7 @@ function isCentExact(value: MoneyJson): boolean {
   return strip(value.exact) === strip(value.display);
 }
 
-function toneOfExact(exact: string): Tone {
+export function toneOfExact(exact: string): Tone {
   const magnitude = exact.replace("-", "");
   if (/^[0.]+$/.test(magnitude)) return "flat";
   return exact.startsWith("-") ? "down" : "up";

@@ -228,7 +228,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F4 — Waterfall and bucket selection
 
-- [ ] **Do:** `waterfall.tsx` (Recharts) and `bucket-selector.tsx`. Column layout when canvas ≥600px and labels fit; else horizontal rows. Bar/chip click selects bucket; Clear deselects. Empty buckets: flat step, no chip.
+- [x] **Do:** `waterfall.tsx` (Recharts) and `bucket-selector.tsx`. Column layout when canvas ≥600px and labels fit; else horizontal rows. Bar/chip click selects bucket; Clear deselects. Empty buckets: flat step, no chip.
 
 - **Consumes:** F3 result layout. Section 8 chart rules.
 - **Produces:** linked selection state consumed by F5.
@@ -314,3 +314,4 @@ Backend subtasks B1–B4: strict **test-driven-development** on each slice of lo
 |------|--------|------|
 | 2026-11-02 | Initial plan. Two slices, one contract | — |
 | 2026-11-02 | Split T1/T2 into B1–B4 and F1–F6; appendices for fixtures and summary grammar | equivalent |
+| 2026-11-03 | F4 chart library: hand-built SVG (matches prototype), not Recharts | equivalent |
