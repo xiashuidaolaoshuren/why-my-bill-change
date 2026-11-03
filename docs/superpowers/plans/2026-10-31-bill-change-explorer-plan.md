@@ -242,7 +242,7 @@ When a slice is complete, every item in **Slice acceptance (checklist)** for tha
 
 #### F5 — Services table, exact sort, and errors
 
-- [ ] **Do:** `compareExact.ts` + tests. `services-table.tsx`: search, status segments with counts, sort via `compareExact`, bucket filter from F4, expand row with source lines and worked formulas from display strings. `errors.tsx`: grouped by file. Empty filter state with clear action. Sticky header; service column pinned on narrow screens.
+- [x] **Do:** `compareExact.ts` + tests. `services-table.tsx`: search, status segments with counts, sort via `compareExact`, bucket filter from F4, expand row with source lines and worked formulas from display strings. `errors.tsx`: grouped by file. Empty filter state with clear action. Sticky header; service column pinned on narrow screens.
 
 - **Consumes:** F4 selection. API rows and errors shape.
 - **Produces:** `src/lib/exact-order.ts`, table and error components.
@@ -315,3 +315,4 @@ Backend subtasks B1–B4: strict **test-driven-development** on each slice of lo
 | 2026-11-02 | Initial plan. Two slices, one contract | — |
 | 2026-11-02 | Split T1/T2 into B1–B4 and F1–F6; appendices for fixtures and summary grammar | equivalent |
 | 2026-11-03 | F4 chart library: hand-built SVG (matches prototype), not Recharts | equivalent |
+| 2026-11-03 | F5: `exact-order.ts` + `services-view.ts`; table and grouped errors | equivalent |

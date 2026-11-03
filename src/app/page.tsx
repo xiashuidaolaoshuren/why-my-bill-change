@@ -9,6 +9,8 @@ import {
   SummarySentence,
 } from "@/components/headline";
 import { UploadPanel, type BillFileSlots } from "@/components/upload";
+import { ValidationErrors } from "@/components/errors";
+import { ServicesTable } from "@/components/services-table";
 import { Waterfall } from "@/components/waterfall";
 import type { BucketKey } from "@/core/compare";
 import type { CompareResponse } from "@/core/present";
@@ -31,11 +33,6 @@ const MIN_PENDING_MS = 280;
 
 const FAILURE_MESSAGE =
   "The comparison could not be completed. Nothing from it is shown.";
-
-const SIDE_LABEL: Record<BillSide, string> = {
-  before: "Before bill",
-  after: "After bill",
-};
 
 const ANNOUNCEMENTS: Record<View, string> = {
   upload: "Upload state. Add both bills to compare them.",
@@ -153,6 +150,11 @@ export default function Home() {
       chipRefs.current[previous]?.focus({ preventScroll: true });
     });
   }, [announce, bucket]);
+
+  const clearAllTableFilters = useCallback(() => {
+    setBucket(null);
+    announce("Filters cleared. The table lists every Service.");
+  }, [announce]);
 
   const runComparison = useCallback(
     async (nextFiles: { before: File; after: File }) => {
@@ -509,6 +511,13 @@ export default function Home() {
                 />
                 <Reconciliation result={result} />
               </section>
+              <ServicesTable
+                result={result}
+                fileNames={comparedNames}
+                bucket={bucket}
+                onClearBucket={clearBucket}
+                onClearAllFilters={clearAllTableFilters}
+              />
             </>
           ) : null}
         </section>
@@ -541,17 +550,13 @@ export default function Home() {
           ) : null}
 
           {errors && errors.length > 0 ? (
-            <ul className="validation-errors">
-              {errors.map((entry, index) => (
-                <li key={`${entry.file}-${entry.line}-${entry.column}-${index}`}>
-                  <strong>{SIDE_LABEL[entry.file]}</strong>
-                  {entry.line !== null ? ` · line ${entry.line}` : ""}
-                  {entry.column ? ` · ${entry.column}` : ""}
-                  {" — "}
-                  {entry.message}
-                </li>
-              ))}
-            </ul>
+            <ValidationErrors
+              errors={errors}
+              fileNames={{
+                before: pendingFiles.before?.name ?? files.before?.name ?? "",
+                after: pendingFiles.after?.name ?? files.after?.name ?? "",
+              }}
+            />
           ) : null}
 
           {failure && errorCount === 0 ? null : (
