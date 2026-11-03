@@ -7,12 +7,21 @@ import { buildSummary, displayRoundingNotice } from "../src/core/summary";
 function buckets(
   totals: Partial<Record<BucketKey, string>> = {},
   contributors: Partial<Record<BucketKey, number>> = {},
+  beforeTotal = "0",
 ): Bucket[] {
-  return BUCKET_KEYS.map((key) => ({
-    key,
-    total: new Decimal(totals[key] ?? "0"),
-    contributors: contributors[key] ?? 0,
-  }));
+  let level = new Decimal(beforeTotal);
+  return BUCKET_KEYS.map((key) => {
+    const total = new Decimal(totals[key] ?? "0");
+    const from = level;
+    level = level.plus(total);
+    return {
+      key,
+      total,
+      from,
+      to: level,
+      contributors: contributors[key] ?? 0,
+    };
+  });
 }
 
 describe("buildSummary sentence grammar", () => {

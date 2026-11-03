@@ -168,6 +168,13 @@ describe("compareBills totals, buckets and contributors", () => {
     for (const bucket of comparison.buckets) {
       expect(bucket.contributors).toBe(1);
     }
+    expect(bucketByKey(comparison, "added").from.toFixed()).toBe("170");
+    expect(bucketByKey(comparison, "added").to.toFixed()).toBe("350");
+    expect(bucketByKey(comparison, "removed").from.toFixed()).toBe("430");
+    expect(bucketByKey(comparison, "removed").to.toFixed()).toBe("410");
+    expect(
+      bucketByKey(comparison, "removed").to.equals(comparison.afterTotal),
+    ).toBe(true);
   });
 
   it("keeps a zero-total bucket with two contributors", () => {
@@ -281,12 +288,21 @@ describe("compareBills totals, buckets and contributors", () => {
 });
 
 describe("assertReconciliation", () => {
-  const bucketsWith = (key: BucketKey, total: string): Bucket[] =>
-    BUCKET_KEYS.map((bucketKey) => ({
-      key: bucketKey,
-      total: new Decimal(bucketKey === key ? total : "0"),
-      contributors: bucketKey === key ? 1 : 0,
-    }));
+  const bucketsWith = (key: BucketKey, total: string): Bucket[] => {
+    let level = new Decimal("10");
+    return BUCKET_KEYS.map((bucketKey) => {
+      const bucketTotal = new Decimal(bucketKey === key ? total : "0");
+      const from = level;
+      level = level.plus(bucketTotal);
+      return {
+        key: bucketKey,
+        total: bucketTotal,
+        from,
+        to: level,
+        contributors: bucketKey === key ? 1 : 0,
+      };
+    });
+  };
 
   it("throws when the before total plus buckets misses the after total", () => {
     expect(() =>

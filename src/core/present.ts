@@ -33,7 +33,10 @@ export type RowJson = {
 export type CompareResponse = {
   currency: "HKD";
   totals: { before: MoneyJson; after: MoneyJson; change: MoneyJson };
-  buckets: Record<BucketKey, MoneyJson & { contributors: number }>;
+  buckets: Record<
+    BucketKey,
+    MoneyJson & { contributors: number; from: MoneyJson; to: MoneyJson }
+  >;
   summary: string;
   summaryParts: SummaryPart[];
   displayRoundingNotice: DisplayRoundingNotice | null;
@@ -76,7 +79,12 @@ export function toCompareResponse(comparison: Comparison): CompareResponse {
   const buckets = Object.fromEntries(
     comparison.buckets.map((bucket) => [
       bucket.key,
-      { ...money(bucket.total), contributors: bucket.contributors },
+      {
+        ...money(bucket.total),
+        contributors: bucket.contributors,
+        from: money(bucket.from),
+        to: money(bucket.to),
+      },
     ]),
   ) as CompareResponse["buckets"];
 

@@ -1,44 +1,144 @@
 {
   "currency": "HKD",
   "totals": {
-    "before": { "exact": "0", "display": "HK$0.00" },
-    "after": { "exact": "0.004", "display": "HK$0.00" },
-    "change": { "exact": "0.004", "display": "HK$0.00" }
+    "before": {
+      "exact": "0",
+      "display": "HK$0.00"
+    },
+    "after": {
+      "exact": "0.004",
+      "display": "HK$0.00"
+    },
+    "change": {
+      "exact": "0.004",
+      "display": "HK$0.00"
+    }
   },
   "buckets": {
-    "added": { "exact": "0.004", "display": "HK$0.00", "contributors": 1 },
-    "usage": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "price": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "removed": { "exact": "0", "display": "HK$0.00", "contributors": 0 }
+    "added": {
+      "exact": "0.004",
+      "display": "HK$0.00",
+      "contributors": 1,
+      "from": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      }
+    },
+    "usage": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      }
+    },
+    "price": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      }
+    },
+    "removed": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      }
+    }
   },
   "summary": "Total increased by less than HK$0.01: less than HK$0.01 from newly added services.",
   "summaryParts": [
-    { "type": "text", "text": "Total increased by " },
-    { "type": "amount", "text": "less than HK$0.01", "tone": "up" },
-    { "type": "text", "text": ": " },
-    { "type": "amount", "text": "less than HK$0.01", "tone": "up" },
-    { "type": "text", "text": " from newly added services" },
-    { "type": "text", "text": "." }
+    {
+      "type": "text",
+      "text": "Total increased by "
+    },
+    {
+      "type": "amount",
+      "text": "less than HK$0.01",
+      "tone": "up"
+    },
+    {
+      "type": "text",
+      "text": ": "
+    },
+    {
+      "type": "amount",
+      "text": "less than HK$0.01",
+      "tone": "up"
+    },
+    {
+      "type": "text",
+      "text": " from newly added services"
+    },
+    {
+      "type": "text",
+      "text": "."
+    }
   ],
   "displayRoundingNotice": null,
   "rows": [
     {
       "service": "Tiny",
       "status": "added",
-      "buckets": ["added"],
+      "buckets": [
+        "added"
+      ],
       "before": null,
       "after": {
-        "quantity": { "exact": "1", "display": "1" },
-        "unitPrice": { "exact": "0.004", "display": "HK$0.00" },
-        "cost": { "exact": "0.004", "display": "HK$0.00" }
+        "quantity": {
+          "exact": "1",
+          "display": "1"
+        },
+        "unitPrice": {
+          "exact": "0.004",
+          "display": "HK$0.00"
+        },
+        "cost": {
+          "exact": "0.004",
+          "display": "HK$0.00"
+        }
       },
       "sources": {
         "before": null,
-        "after": { "fileName": "after.csv", "line": 2 }
+        "after": {
+          "fileName": "after.csv",
+          "line": 2
+        }
       },
-      "usageEffect": { "exact": "0", "display": "HK$0.00" },
-      "priceEffect": { "exact": "0", "display": "HK$0.00" },
-      "change": { "exact": "0.004", "display": "HK$0.00" }
+      "usageEffect": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "priceEffect": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "change": {
+        "exact": "0.004",
+        "display": "HK$0.00"
+      }
     }
   ]
 }

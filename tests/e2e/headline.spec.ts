@@ -47,6 +47,24 @@ test("headline sample: summary, Bucket filter, expanded row, clear", async ({
   await expect(page.locator(".rec-value").first()).toHaveText("HK$170");
   await expect(page.locator(".rec-value").last()).toHaveText("HK$410");
 
+  const removedHit = page.locator('button.wf-hit[data-bucket="removed"]');
+  await removedHit.focus();
+  const tooltip = page.locator(".wf-tooltip");
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip.locator(".tt-title")).toHaveText("Removed Bucket");
+  await expect(tooltip.locator(".tt-row")).toHaveCount(4);
+  const tooltipText = await tooltip.innerText();
+  expect(tooltipText).toContain("Displayed");
+  expect(tooltipText).toContain("-HK$20.00");
+  expect(tooltipText).toContain("Exact");
+  expect(tooltipText).toContain("From");
+  expect(tooltipText).toContain("HK$430.00");
+  expect(tooltipText).toContain("To");
+  expect(tooltipText).toContain("HK$410.00");
+  await expect(tooltip.locator(".tt-foot")).toHaveText(
+    "1 Contributor · select to filter the table",
+  );
+
   // Default order is the largest increase first.
   await expect(serviceNames(page)).toHaveText([
     "Support",

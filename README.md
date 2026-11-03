@@ -123,8 +123,10 @@ flowchart LR
   sample CSVs from `samples/`.
 - The browser never calculates or rounds money. The API sends each amount twice:
   an exact decimal string and a display string rounded to the cent, plus a notice
-  when the rounded displays do not add up. Sorting and the waterfall's magnitude
-  order compare exact strings (`src/lib/exact-order.ts`), never a `Number`.
+  when the rounded displays do not add up. Each bucket in the JSON also includes
+  `from` and `to`: the running waterfall level before and after that step. Sorting
+  and the waterfall's magnitude order compare exact strings (`src/lib/exact-order.ts`),
+  never a `Number`.
 - The chart is hand-built SVG. Converting amounts to pixel coordinates is the
   only place a float is used.
 - `npm run check:core` fails the build if `Number(` or `parseFloat` appears in

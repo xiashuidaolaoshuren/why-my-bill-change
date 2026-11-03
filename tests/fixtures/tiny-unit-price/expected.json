@@ -1,48 +1,160 @@
 {
   "currency": "HKD",
   "totals": {
-    "before": { "exact": "0.001000002", "display": "HK$0.00" },
-    "after": { "exact": "0.002000004", "display": "HK$0.00" },
-    "change": { "exact": "0.001000002", "display": "HK$0.00" }
+    "before": {
+      "exact": "0.001000002",
+      "display": "HK$0.00"
+    },
+    "after": {
+      "exact": "0.002000004",
+      "display": "HK$0.00"
+    },
+    "change": {
+      "exact": "0.001000002",
+      "display": "HK$0.00"
+    }
   },
   "buckets": {
-    "added": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "usage": { "exact": "0.001000002", "display": "HK$0.00", "contributors": 1 },
-    "price": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "removed": { "exact": "0", "display": "HK$0.00", "contributors": 0 }
+    "added": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0.001000002",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.001000002",
+        "display": "HK$0.00"
+      }
+    },
+    "usage": {
+      "exact": "0.001000002",
+      "display": "HK$0.00",
+      "contributors": 1,
+      "from": {
+        "exact": "0.001000002",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.002000004",
+        "display": "HK$0.00"
+      }
+    },
+    "price": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0.002000004",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.002000004",
+        "display": "HK$0.00"
+      }
+    },
+    "removed": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0.002000004",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0.002000004",
+        "display": "HK$0.00"
+      }
+    }
   },
   "summary": "Total increased by less than HK$0.01: less than HK$0.01 from usage changes.",
   "summaryParts": [
-    { "type": "text", "text": "Total increased by " },
-    { "type": "amount", "text": "less than HK$0.01", "tone": "up" },
-    { "type": "text", "text": ": " },
-    { "type": "amount", "text": "less than HK$0.01", "tone": "up" },
-    { "type": "text", "text": " from usage changes" },
-    { "type": "text", "text": "." }
+    {
+      "type": "text",
+      "text": "Total increased by "
+    },
+    {
+      "type": "amount",
+      "text": "less than HK$0.01",
+      "tone": "up"
+    },
+    {
+      "type": "text",
+      "text": ": "
+    },
+    {
+      "type": "amount",
+      "text": "less than HK$0.01",
+      "tone": "up"
+    },
+    {
+      "type": "text",
+      "text": " from usage changes"
+    },
+    {
+      "type": "text",
+      "text": "."
+    }
   ],
   "displayRoundingNotice": null,
   "rows": [
     {
       "service": "Compute",
       "status": "changed",
-      "buckets": ["usage"],
+      "buckets": [
+        "usage"
+      ],
       "before": {
-        "quantity": { "exact": "60", "display": "60" },
-        "unitPrice": { "exact": "0.0000166667", "display": "HK$0.00" },
-        "cost": { "exact": "0.001000002", "display": "HK$0.00" }
+        "quantity": {
+          "exact": "60",
+          "display": "60"
+        },
+        "unitPrice": {
+          "exact": "0.0000166667",
+          "display": "HK$0.00"
+        },
+        "cost": {
+          "exact": "0.001000002",
+          "display": "HK$0.00"
+        }
       },
       "after": {
-        "quantity": { "exact": "120", "display": "120" },
-        "unitPrice": { "exact": "0.0000166667", "display": "HK$0.00" },
-        "cost": { "exact": "0.002000004", "display": "HK$0.00" }
+        "quantity": {
+          "exact": "120",
+          "display": "120"
+        },
+        "unitPrice": {
+          "exact": "0.0000166667",
+          "display": "HK$0.00"
+        },
+        "cost": {
+          "exact": "0.002000004",
+          "display": "HK$0.00"
+        }
       },
       "sources": {
-        "before": { "fileName": "before.csv", "line": 2 },
-        "after": { "fileName": "after.csv", "line": 2 }
+        "before": {
+          "fileName": "before.csv",
+          "line": 2
+        },
+        "after": {
+          "fileName": "after.csv",
+          "line": 2
+        }
       },
-      "usageEffect": { "exact": "0.001000002", "display": "HK$0.00" },
-      "priceEffect": { "exact": "0", "display": "HK$0.00" },
-      "change": { "exact": "0.001000002", "display": "HK$0.00" }
+      "usageEffect": {
+        "exact": "0.001000002",
+        "display": "HK$0.00"
+      },
+      "priceEffect": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "change": {
+        "exact": "0.001000002",
+        "display": "HK$0.00"
+      }
     }
   ]
 }

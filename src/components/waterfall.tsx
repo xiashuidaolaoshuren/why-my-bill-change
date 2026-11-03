@@ -9,7 +9,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { exactText, isCentExact, toneOfExact } from "@/components/headline";
+import { exactText, toneOfExact } from "@/components/headline";
 import { BUCKET_KEYS, type BucketKey } from "@/core/compare";
 import type { CompareResponse, MoneyJson } from "@/core/present";
 import type { Tone } from "@/core/summary";
@@ -47,6 +47,8 @@ export type ChartStep = {
   startNum: number;
   endNum: number;
   value: MoneyJson;
+  from?: MoneyJson;
+  to?: MoneyJson;
   tone: StepTone;
   selectable?: boolean;
   count?: number;
@@ -87,20 +89,19 @@ export function buildSteps(result: CompareResponse): ChartStep[] {
     },
   ];
 
-  let level = beforeNum;
   for (const key of BUCKET_KEYS) {
     const bucket = result.buckets[key];
-    const startNum = level;
-    level += plotNum(bucket.exact);
     const count = bucket.contributors;
     steps.push({
       key,
       kind: "bucket",
       label: BUCKET_LABELS[key],
       meta: count ? plural(count, "Contributor") : "No Contributors",
-      startNum,
-      endNum: level,
+      startNum: plotNum(bucket.from.exact),
+      endNum: plotNum(bucket.to.exact),
       value: { exact: bucket.exact, display: bucket.display },
+      from: bucket.from,
+      to: bucket.to,
       tone: toneOfExact(bucket.exact),
       selectable: count > 0,
       count,
@@ -306,6 +307,12 @@ function TooltipBody({
     { key: "Displayed", value: step.value.display },
     { key: "Exact", value: exactText(step.value) },
   ];
+  if (step.kind === "bucket" && step.from && step.to) {
+    rows.push(
+      { key: "From", value: step.from.display },
+      { key: "To", value: step.to.display },
+    );
+  }
 
   let foot: string;
   if (step.kind === "bucket") {
@@ -319,19 +326,16 @@ function TooltipBody({
   }
 
   const title = step.kind === "bucket" ? `${step.label} Bucket` : step.label;
-  const showExactRow = !isCentExact(step.value);
 
   return (
     <>
       <span className="tt-title">{title}</span>
-      {rows.map((row) =>
-        row.key === "Exact" && !showExactRow ? null : (
-          <div key={row.key} className="tt-row">
-            <span className="tt-key">{row.key}</span>
-            <span className="tt-val">{row.value}</span>
-          </div>
-        ),
-      )}
+      {rows.map((row) => (
+        <div key={row.key} className="tt-row">
+          <span className="tt-key">{row.key}</span>
+          <span className="tt-val">{row.value}</span>
+        </div>
+      ))}
       <span className="tt-foot">{foot}</span>
     </>
   );

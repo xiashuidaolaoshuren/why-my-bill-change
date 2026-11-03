@@ -155,10 +155,34 @@ Success (200):
     "change": { "exact": "240", "display": "HK$240.00" }
   },
   "buckets": {
-    "added": { "exact": "180", "display": "HK$180.00", "contributors": 1 },
-    "usage": { "exact": "60", "display": "HK$60.00", "contributors": 1 },
-    "price": { "exact": "20", "display": "HK$20.00", "contributors": 1 },
-    "removed": { "exact": "-20", "display": "-HK$20.00", "contributors": 1 }
+    "added": {
+      "exact": "180",
+      "display": "HK$180.00",
+      "contributors": 1,
+      "from": { "exact": "170", "display": "HK$170.00" },
+      "to": { "exact": "350", "display": "HK$350.00" }
+    },
+    "usage": {
+      "exact": "60",
+      "display": "HK$60.00",
+      "contributors": 1,
+      "from": { "exact": "350", "display": "HK$350.00" },
+      "to": { "exact": "410", "display": "HK$410.00" }
+    },
+    "price": {
+      "exact": "20",
+      "display": "HK$20.00",
+      "contributors": 1,
+      "from": { "exact": "410", "display": "HK$410.00" },
+      "to": { "exact": "430", "display": "HK$430.00" }
+    },
+    "removed": {
+      "exact": "-20",
+      "display": "-HK$20.00",
+      "contributors": 1,
+      "from": { "exact": "430", "display": "HK$430.00" },
+      "to": { "exact": "410", "display": "HK$410.00" }
+    }
   },
   "summary": "Total increased by HK$240.00: HK$180.00 from newly added services, HK$60.00 from usage changes, and HK$20.00 from price changes, partly offset by HK$20.00 from removed services.",
   "displayRoundingNotice": null,
@@ -185,7 +209,7 @@ Success (200):
 }
 ```
 
-`before` and `sources.before` are null for added rows. `after` and `sources.after` are null for removed rows. `buckets` lists only the buckets where the row's exact effect is non-zero. `contributors` counts those rows. Quantity display strings keep their exact decimal text and have no currency prefix. A negative money display places the minus sign before `HK$`.
+`before` and `sources.before` are null for added rows. `after` and `sources.after` are null for removed rows. `buckets` lists only the buckets where the row's exact effect is non-zero. `contributors` counts those rows. Each bucket object also carries `from` and `to`: the running waterfall level before and after that bucket step (the before total plus preceding bucket totals, then plus this bucket). Quantity display strings keep their exact decimal text and have no currency prefix. A negative money display places the minus sign before `HK$`.
 
 Errors: 400 `{ "errors": [{ "file", "line", "column", "message" }] }` for invalid input, including missing files and over-limit files. 500 if the reconciliation assertion fails.
 

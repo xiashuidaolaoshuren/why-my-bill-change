@@ -27,6 +27,8 @@ export type ComparedRow = {
 export type Bucket = {
   key: BucketKey;
   total: DecimalInstance;
+  from: DecimalInstance;
+  to: DecimalInstance;
   contributors: number;
 };
 
@@ -168,11 +170,19 @@ export function compareBills(
   const afterTotal = normalized(sum(after));
   const totalChange = normalized(afterTotal.minus(beforeTotal));
 
+  let level = beforeTotal;
   const buckets = BUCKET_KEYS.map((key) => {
     const effects = rows.map((row) => rowBucketEffect(row, key));
+    const total = normalized(
+      effects.reduce((sum, effect) => sum.plus(effect), zero()),
+    );
+    const from = level;
+    level = normalized(level.plus(total));
     return {
       key,
-      total: normalized(effects.reduce((total, effect) => total.plus(effect), zero())),
+      total,
+      from,
+      to: level,
       contributors: effects.filter((effect) => !effect.isZero()).length,
     };
   });

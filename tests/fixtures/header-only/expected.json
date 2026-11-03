@@ -1,18 +1,80 @@
 {
   "currency": "HKD",
   "totals": {
-    "before": { "exact": "0", "display": "HK$0.00" },
-    "after": { "exact": "0", "display": "HK$0.00" },
-    "change": { "exact": "0", "display": "HK$0.00" }
+    "before": {
+      "exact": "0",
+      "display": "HK$0.00"
+    },
+    "after": {
+      "exact": "0",
+      "display": "HK$0.00"
+    },
+    "change": {
+      "exact": "0",
+      "display": "HK$0.00"
+    }
   },
   "buckets": {
-    "added": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "usage": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "price": { "exact": "0", "display": "HK$0.00", "contributors": 0 },
-    "removed": { "exact": "0", "display": "HK$0.00", "contributors": 0 }
+    "added": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0",
+        "display": "HK$0.00"
+      }
+    },
+    "usage": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0",
+        "display": "HK$0.00"
+      }
+    },
+    "price": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0",
+        "display": "HK$0.00"
+      }
+    },
+    "removed": {
+      "exact": "0",
+      "display": "HK$0.00",
+      "contributors": 0,
+      "from": {
+        "exact": "0",
+        "display": "HK$0.00"
+      },
+      "to": {
+        "exact": "0",
+        "display": "HK$0.00"
+      }
+    }
   },
   "summary": "Total did not change.",
-  "summaryParts": [{ "type": "text", "text": "Total did not change." }],
+  "summaryParts": [
+    {
+      "type": "text",
+      "text": "Total did not change."
+    }
+  ],
   "displayRoundingNotice": null,
   "rows": []
 }

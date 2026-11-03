@@ -48,11 +48,15 @@ describe("toCompareResponse", () => {
       exact: "180",
       display: "HK$180.00",
       contributors: 1,
+      from: { exact: "170", display: "HK$170.00" },
+      to: { exact: "350", display: "HK$350.00" },
     });
     expect(response.buckets.removed).toEqual({
       exact: "-20",
       display: "-HK$20.00",
       contributors: 1,
+      from: { exact: "430", display: "HK$430.00" },
+      to: { exact: "410", display: "HK$410.00" },
     });
     expect(response.summary).toBe(
       "Total increased by HK$240.00: HK$180.00 from newly added services, HK$60.00 from usage changes, and HK$20.00 from price changes, partly offset by HK$20.00 from removed services.",
