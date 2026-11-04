@@ -37,20 +37,13 @@ export function defaultSort(bucket: BucketKey | null): SortState {
 export function contributionOf(row: RowJson, bucket: BucketKey): MoneyJson {
   switch (bucket) {
     case "added":
-      return row.status === "added" ? row.change : zeroMoney();
     case "removed":
-      return row.status === "removed" ? row.change : zeroMoney();
+      return row.change;
     case "usage":
       return row.usageEffect;
     case "price":
       return row.priceEffect;
-    default:
-      return zeroMoney();
   }
-}
-
-function zeroMoney(): MoneyJson {
-  return { exact: "0", display: "HK$0.00" };
 }
 
 function compareNames(a: string, b: string): number {

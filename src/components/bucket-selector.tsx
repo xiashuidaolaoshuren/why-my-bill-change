@@ -1,16 +1,14 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { exactText, isCentExact, toneOfExact } from "@/components/headline";
 import { BUCKET_KEYS, type BucketKey, type Tone } from "@/core/contract";
 import type { CompareResponse } from "@/core/present";
-
-const BUCKET_LABELS: Record<BucketKey, string> = {
-  added: "Added",
-  usage: "Usage",
-  price: "Price",
-  removed: "Removed",
-};
+import {
+  BUCKET_LABELS,
+  exactText,
+  isCentExact,
+  toneOfExact,
+} from "@/lib/display";
 
 const ICON_PATHS: Record<Tone, string[]> = {
   up: ["M8 13V3.5M4 7.5 8 3.5l4 4"],

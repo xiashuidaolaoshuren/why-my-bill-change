@@ -9,9 +9,9 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { exactText, toneOfExact } from "@/components/headline";
 import { BUCKET_KEYS, type BucketKey, type Tone } from "@/core/contract";
 import type { CompareResponse, MoneyJson } from "@/core/present";
+import { BUCKET_LABELS, exactText, toneOfExact } from "@/lib/display";
 
 const CHART = {
   columnMinWidth: 600,
@@ -25,13 +25,6 @@ const CHART = {
   rowPad: 8,
   stagger: 45,
 } as const;
-
-const BUCKET_LABELS: Record<BucketKey, string> = {
-  added: "Added",
-  usage: "Usage",
-  price: "Price",
-  removed: "Removed",
-};
 
 export type ChartStepKey = BucketKey | "before" | "after";
 

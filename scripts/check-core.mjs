@@ -9,7 +9,12 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = process.cwd();
-const TARGETS = ["src/core", "src/lib/exact-order.ts", "src/lib/services-view.ts"];
+const TARGETS = [
+  "src/core",
+  "src/lib/exact-order.ts",
+  "src/lib/services-view.ts",
+  "src/lib/display.ts",
+];
 const FORBIDDEN = [/\bparseFloat\s*\(/, /\bNumber\s*\(/];
 const EXTENSIONS = new Set([".ts", ".tsx"]);
 

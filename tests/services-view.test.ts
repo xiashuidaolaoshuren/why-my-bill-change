@@ -37,6 +37,14 @@ describe("contributionOf", () => {
       buckets: ["usage"],
     });
     expect(contributionOf(usage, "usage").exact).toBe("60");
+
+    const removed = row({
+      service: "R",
+      status: "removed",
+      change: { exact: "-20", display: "-HK$20.00" },
+      buckets: ["removed"],
+    });
+    expect(contributionOf(removed, "removed").exact).toBe("-20");
   });
 });
 

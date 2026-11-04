@@ -1,19 +1,18 @@
 import { Fragment } from "react";
 import type { CompareResponse, MoneyJson } from "@/core/present";
 import type { Tone } from "@/core/contract";
+import {
+  BUCKET_ENTRIES,
+  exactText,
+  isCentExact,
+  toneOfExact,
+} from "@/lib/display";
 
 /**
  * Headline pieces of the result view. Every figure comes from the API as a
  * string: the browser never does money math, so "exact" and "tone" are read
  * from the payload rather than recomputed from a Number.
  */
-
-const BUCKETS = [
-  { key: "added", label: "Added" },
-  { key: "usage", label: "Usage" },
-  { key: "price", label: "Price" },
-  { key: "removed", label: "Removed" },
-] as const;
 
 const ICON_PATHS: Record<string, string[]> = {
   up: ["M8 13V3.5M4 7.5 8 3.5l4 4"],
@@ -41,32 +40,6 @@ function Icon({ name }: { name: keyof typeof ICON_PATHS }) {
       ))}
     </svg>
   );
-}
-
-/** The amount in `display` is rounded to the cent; `exact` may carry more digits. */
-export function isCentExact(value: MoneyJson): boolean {
-  const strip = (text: string) => {
-    const clean = text.replace("HK$", "").replace(/,/g, "");
-    const [whole, fraction] = clean.split(".");
-    if (!fraction) return whole;
-    const trimmed = fraction.replace(/0+$/, "");
-    const result = trimmed ? `${whole}.${trimmed}` : whole;
-    return result === "-0" ? "0" : result;
-  };
-  return strip(value.exact) === strip(value.display);
-}
-
-export function toneOfExact(exact: string): Tone {
-  const magnitude = exact.replace("-", "");
-  if (/^[0.]+$/.test(magnitude)) return "flat";
-  return exact.startsWith("-") ? "down" : "up";
-}
-
-/** Currency-prefixed exact text: `HK$170`, `-HK$0.004`. No separators, no rounding. */
-export function exactText(value: MoneyJson): string {
-  return value.exact.startsWith("-")
-    ? `-HK$${value.exact.slice(1)}`
-    : `HK$${value.exact}`;
 }
 
 const DIRECTION_LABEL: Record<Tone, string> = {
@@ -196,7 +169,7 @@ export function Stats({
 }
 
 export function Reconciliation({ result }: { result: CompareResponse }) {
-  const spoken = `Before total ${exactText(result.totals.before)}, ${BUCKETS.map(
+  const spoken = `Before total ${exactText(result.totals.before)}, ${BUCKET_ENTRIES.map(
     (bucket) => `${bucket.label} ${exactText(result.buckets[bucket.key])}`,
   ).join(", ")}, equals after total ${exactText(result.totals.after)}.`;
 
@@ -208,7 +181,7 @@ export function Reconciliation({ result }: { result: CompareResponse }) {
           <span className="rec-name">Before total</span>
           <span className="rec-value">{exactText(result.totals.before)}</span>
         </span>
-        {BUCKETS.map((bucket) => (
+        {BUCKET_ENTRIES.map((bucket) => (
           <Fragment key={bucket.key}>
             <span className="rec-op" aria-hidden="true">
               +

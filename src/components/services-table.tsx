@@ -9,8 +9,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { exactText, isCentExact, toneOfExact } from "@/components/headline";
 import type { BucketKey } from "@/core/contract";
+import {
+  BUCKET_LABELS,
+  exactText,
+  isCentExact,
+  toneOfExact,
+} from "@/lib/display";
 import type { CompareResponse, MoneyJson, RowJson, RowSideJson } from "@/core/present";
 import {
   contributionOf,
@@ -20,13 +25,6 @@ import {
   type SortState,
   type StatusFilter,
 } from "@/lib/services-view";
-
-const BUCKET_LABELS: Record<BucketKey, string> = {
-  added: "Added",
-  usage: "Usage",
-  price: "Price",
-  removed: "Removed",
-};
 
 const STATUS_LABEL: Record<RowJson["status"], string> = {
   added: "Added",
