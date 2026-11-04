@@ -2,7 +2,11 @@ import { compareBills } from "../../../core/compare";
 import type { Comparison } from "../../../core/compare";
 import { toCompareResponse } from "../../../core/present";
 import type { ValidatedService } from "../../../core/validate";
-import { validateBill } from "../../../core/validate";
+import {
+  decodeBillText,
+  fileError,
+  validateBill,
+} from "../../../core/validate";
 import type { BillSide, ValidationError } from "../../../core/validate";
 
 const MISSING_FILE_MESSAGE = "Upload a CSV file for this bill.";
@@ -53,27 +57,51 @@ export async function handleCompare(
   if (!(beforeField instanceof File)) {
     errors.push(missingFileError("before"));
   } else {
-    const before = validateBill({
-      side: "before",
-      fileName: beforeField.name,
-      text: await beforeField.text(),
-    });
-    beforeServices = before.services;
-    beforeRows = before.services.length;
-    errors.push(...before.errors);
+    const decoded = decodeBillText(
+      new Uint8Array(await beforeField.arrayBuffer()),
+    );
+    if (!decoded.ok) {
+      errors.push(
+        fileError(
+          "before",
+          "The file is not valid UTF-8. Save the bill as UTF-8 CSV.",
+        ),
+      );
+    } else {
+      const before = validateBill({
+        side: "before",
+        fileName: beforeField.name,
+        text: decoded.text,
+      });
+      beforeServices = before.services;
+      beforeRows = before.services.length;
+      errors.push(...before.errors);
+    }
   }
 
   if (!(afterField instanceof File)) {
     errors.push(missingFileError("after"));
   } else {
-    const after = validateBill({
-      side: "after",
-      fileName: afterField.name,
-      text: await afterField.text(),
-    });
-    afterServices = after.services;
-    afterRows = after.services.length;
-    errors.push(...after.errors);
+    const decoded = decodeBillText(
+      new Uint8Array(await afterField.arrayBuffer()),
+    );
+    if (!decoded.ok) {
+      errors.push(
+        fileError(
+          "after",
+          "The file is not valid UTF-8. Save the bill as UTF-8 CSV.",
+        ),
+      );
+    } else {
+      const after = validateBill({
+        side: "after",
+        fileName: afterField.name,
+        text: decoded.text,
+      });
+      afterServices = after.services;
+      afterRows = after.services.length;
+      errors.push(...after.errors);
+    }
   }
 
   const durationMs = Math.round(performance.now() - started);

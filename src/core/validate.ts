@@ -26,11 +26,24 @@ const PLAIN_DECIMAL = /^\d+(\.\d+)?$/;
 
 type RequiredColumn = (typeof REQUIRED_COLUMNS)[number];
 
-function fileError(
+export function fileError(
   file: BillSide,
   message: string,
 ): ValidationError {
   return { file, line: null, column: null, message };
+}
+
+export function decodeBillText(
+  bytes: Uint8Array,
+): { ok: true; text: string } | { ok: false } {
+  try {
+    return {
+      ok: true,
+      text: new TextDecoder("utf-8", { fatal: true }).decode(bytes),
+    };
+  } catch {
+    return { ok: false };
+  }
 }
 
 function cellError(

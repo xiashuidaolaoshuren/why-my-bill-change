@@ -1,12 +1,25 @@
 import { describe, expect, it, vi } from "vitest";
 import { Decimal } from "../src/core/money";
 import * as parseModule from "../src/core/parse";
-import { validateBill } from "../src/core/validate";
+import { decodeBillText, validateBill } from "../src/core/validate";
 
 const beforeBill = {
   side: "before" as const,
   fileName: "before.csv",
 };
+
+describe("decodeBillText", () => {
+  it("rejects bytes that are not valid UTF-8", () => {
+    expect(decodeBillText(new Uint8Array([0xff, 0xfe, 0x41]))).toEqual({
+      ok: false,
+    });
+  });
+
+  it("decodes valid UTF-8 text", () => {
+    const bytes = new TextEncoder().encode("service,quantity,unit_price\n");
+    expect(decodeBillText(bytes)).toEqual({ ok: true, text: "service,quantity,unit_price\n" });
+  });
+});
 
 describe("validateBill happy path", () => {
   it("accepts trimmed mixed-case headers, ignores extra columns, and header-only files", () => {

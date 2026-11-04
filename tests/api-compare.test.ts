@@ -85,6 +85,34 @@ describe("POST /api/compare", () => {
     expect(body).not.toHaveProperty("summary");
   });
 
+  it("returns 400 for invalid UTF-8 on one bill and still validates the other", async () => {
+    const before = new File([new Uint8Array([0xff, 0xfe])], "bad.csv", {
+      type: "text/csv",
+    });
+    const after = new File(
+      ["service,quantity,unit_price\nBad,1,oops\n"],
+      "after.csv",
+      { type: "text/csv" },
+    );
+
+    const response = await POST(compareRequest(before, after));
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.errors).toEqual(
+      expect.arrayContaining([
+        {
+          file: "before",
+          line: null,
+          column: null,
+          message: expect.stringContaining("UTF-8"),
+        },
+        { file: "after", line: 2, column: "unit_price", message: expect.any(String) },
+      ]),
+    );
+    expect(body.errors).toHaveLength(2);
+  });
+
   it("validates both sides when before is missing", async () => {
     const form = new FormData();
     form.set(
