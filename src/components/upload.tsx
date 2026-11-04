@@ -314,7 +314,7 @@ Storage,50,1.40`}</code>
         <ul className="format-rules">
           <li>
             All amounts are Hong Kong dollars (HK$). <code>unit_price</code> is the
-            Cost of one Quantity unit.
+            price of one Quantity unit.
           </li>
           <li>
             Header names are trimmed and case-insensitive; extra columns are ignored.
