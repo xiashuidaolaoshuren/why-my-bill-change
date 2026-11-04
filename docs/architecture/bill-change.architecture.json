@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Why did my bill change?",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "views": [
+      {
+        "id": "compare-path",
+        "label": "Compare two bills",
+        "focus": ["reviewer", "page", "compareApi", "core"],
+        "note": "The reviewer posts both CSVs. The route validates them, then the core reconciles the Total change."
+      },
+      {
+        "id": "demo-files",
+        "label": "Demo samples",
+        "focus": ["page", "samplesApi"],
+        "note": "Headline, Rounding, Invalid, and Opposing load as CSV text, then go through the same compare path."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "reviewer",
+      "type": "external",
+      "label": "Reviewer",
+      "sublabel": "Browser",
+      "pos": [48, 248],
+      "size": [168, 76]
+    },
+    {
+      "id": "page",
+      "type": "frontend",
+      "label": "Comparison page",
+      "sublabel": "Upload, chart, table",
+      "pos": [320, 248],
+      "size": [196, 76]
+    },
+    {
+      "id": "compareApi",
+      "type": "backend",
+      "label": "POST /api/compare",
+      "sublabel": "Multipart CSV pair",
+      "pos": [620, 248],
+      "size": [210, 76]
+    },
+    {
+      "id": "core",
+      "type": "backend",
+      "label": "Comparison core",
+      "sublabel": "Parse, validate, reconcile",
+      "pos": [936, 248],
+      "size": [220, 76]
+    },
+    {
+      "id": "samplesApi",
+      "type": "backend",
+      "label": "GET /samples/[file]",
+      "sublabel": "Four demo pairs",
+      "pos": [620, 468],
+      "size": [210, 76]
+    },
+    {
+      "id": "decimal",
+      "type": "external",
+      "label": "decimal.js",
+      "sublabel": "Exact money",
+      "pos": [946, 468],
+      "size": [200, 76]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Browser",
+      "wraps": ["page"]
+    },
+    {
+      "kind": "region",
+      "label": "Next.js server",
+      "wraps": ["compareApi", "core", "samplesApi", "decimal"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "open-page",
+      "from": "reviewer",
+      "to": "page",
+      "label": "opens",
+      "variant": "emphasis"
+    },
+    {
+      "id": "post-bills",
+      "from": "page",
+      "to": "compareApi",
+      "label": "POST both CSVs",
+      "variant": "emphasis"
+    },
+    {
+      "id": "run-core",
+      "from": "compareApi",
+      "to": "core",
+      "label": "validated bills",
+      "variant": "emphasis"
+    },
+    {
+      "id": "load-demo",
+      "from": "page",
+      "to": "samplesApi",
+      "label": "load a demo",
+      "variant": "dashed"
+    },
+    {
+      "id": "exact-money",
+      "from": "core",
+      "to": "decimal",
+      "label": "exact decimals",
+      "variant": "dashed",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Browser",
+      "items": [
+        "Four views: upload, pending, result, error",
+        "Waterfall and Services table render API strings only"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Server",
+      "items": [
+        "POST /api/compare returns totals, Buckets, and rows",
+        "Core rejects Number and parseFloat for money"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Demos",
+      "items": [
+        "Headline, Rounding, Invalid, and Opposing",
+        "Sample CSVs are read from samples/ at request time"
+      ]
+    }
+  ]
+}
