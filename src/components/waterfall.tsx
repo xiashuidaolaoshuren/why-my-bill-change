@@ -15,6 +15,7 @@ import { BUCKET_LABELS, exactText, toneOfExact } from "@/lib/display";
 
 const CHART = {
   columnMinWidth: 600,
+  /** 13px JetBrains Mono advance, used to keep value labels from colliding. */
   figureCharWidth: 7.9,
   padX: 8,
   top: 40,
@@ -301,8 +302,8 @@ function TooltipBody({
   ];
   if (step.kind === "bucket" && step.from && step.to) {
     rows.push(
-      { key: "From", value: step.from.display },
-      { key: "To", value: step.to.display },
+      { key: "From", value: exactText(step.from) },
+      { key: "To", value: exactText(step.to) },
     );
   }
 

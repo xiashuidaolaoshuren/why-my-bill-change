@@ -19,6 +19,7 @@ line2",10,1`;
     ]);
     expect(result.records[1].line).toBe(2);
     expect(result.records[1].fields[0]).toBe("line1\nline2");
+    expect(result.records[1].source).toBe('"line1\nline2",10,1');
   });
 
   it("unescapes doubled quotes inside a quoted field", () => {

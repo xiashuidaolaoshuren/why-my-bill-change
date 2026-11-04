@@ -77,8 +77,20 @@ describe("POST /api/compare", () => {
 
     expect(response.status).toBe(400);
     expect(body.errors).toEqual([
-      { file: "before", line: 3, column: "unit_price", message: expect.any(String) },
-      { file: "before", line: 5, column: "service", message: expect.any(String) },
+      {
+        file: "before",
+        line: 3,
+        column: "unit_price",
+        message: expect.any(String),
+        source: "Storage,50,oops",
+      },
+      {
+        file: "before",
+        line: 5,
+        column: "service",
+        message: expect.any(String),
+        source: "Support,12,1",
+      },
     ]);
     expect(body).not.toHaveProperty("totals");
     expect(body).not.toHaveProperty("rows");
@@ -106,8 +118,15 @@ describe("POST /api/compare", () => {
           line: null,
           column: null,
           message: expect.stringContaining("UTF-8"),
+          source: null,
         },
-        { file: "after", line: 2, column: "unit_price", message: expect.any(String) },
+        {
+          file: "after",
+          line: 2,
+          column: "unit_price",
+          message: expect.any(String),
+          source: "Bad,1,oops",
+        },
       ]),
     );
     expect(body.errors).toHaveLength(2);
@@ -136,8 +155,15 @@ describe("POST /api/compare", () => {
           line: null,
           column: null,
           message: "Upload a CSV file for this bill.",
+          source: null,
         },
-        { file: "after", line: 2, column: "unit_price", message: expect.any(String) },
+        {
+          file: "after",
+          line: 2,
+          column: "unit_price",
+          message: expect.any(String),
+          source: "Bad,1,oops",
+        },
       ]),
     );
     expect(body.errors).toHaveLength(2);

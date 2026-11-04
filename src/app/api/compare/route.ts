@@ -17,7 +17,13 @@ type CompareFn = (
 ) => Comparison;
 
 function missingFileError(file: BillSide): ValidationError {
-  return { file, line: null, column: null, message: MISSING_FILE_MESSAGE };
+  return {
+    file,
+    line: null,
+    column: null,
+    message: MISSING_FILE_MESSAGE,
+    source: null,
+  };
 }
 
 function logCompare(outcome: {

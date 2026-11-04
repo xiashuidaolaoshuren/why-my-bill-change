@@ -17,8 +17,9 @@ import type { CompareResponse } from "@/core/present";
 import type { BillSide, ValidationError } from "@/core/validate";
 import {
   loadHeadlineSample,
-  loadInvalidSample,
+  loadSample,
   SAMPLE_LOAD_FAILURE,
+  type SampleDemoId,
 } from "@/lib/load-sample";
 
 /**
@@ -280,9 +281,12 @@ export default function Home() {
     void loadAndCompare(loadHeadlineSample);
   }, [loadAndCompare]);
 
-  const onUseInvalidSample = useCallback(() => {
-    void loadAndCompare(loadInvalidSample);
-  }, [loadAndCompare]);
+  const onUseDemo = useCallback(
+    (id: SampleDemoId) => {
+      void loadAndCompare(() => loadSample(id));
+    },
+    [loadAndCompare],
+  );
 
   const startOver = useCallback(() => {
     runRef.current += 1;
@@ -374,7 +378,7 @@ export default function Home() {
             onRemove={onRemove}
             onCompare={onCompare}
             onUseSample={onUseSample}
-            onUseInvalidSample={onUseInvalidSample}
+            onUseDemo={onUseDemo}
             busy={busy}
             announce={announce}
           />

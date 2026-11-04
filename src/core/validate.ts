@@ -10,6 +10,7 @@ export type ValidationError = {
   line: number | null;
   column: string | null;
   message: string;
+  source: string | null;
 };
 
 export type ValidatedService = {
@@ -30,7 +31,7 @@ export function fileError(
   file: BillSide,
   message: string,
 ): ValidationError {
-  return { file, line: null, column: null, message };
+  return { file, line: null, column: null, message, source: null };
 }
 
 export function decodeBillText(
@@ -51,8 +52,9 @@ function cellError(
   line: number,
   column: RequiredColumn,
   message: string,
+  source: string,
 ): ValidationError {
-  return { file, line, column, message };
+  return { file, line, column, message, source };
 }
 
 function stripBom(text: string): string {
@@ -207,7 +209,7 @@ export function validateBill({
   const firstLineByService = new Map<string, number>();
 
   for (const record of dataRecords) {
-    const { line, fields } = record;
+    const { line, fields, source } = record;
     const rowErrors: ValidationError[] = [];
 
     if (fields.length < minimumFields) {
@@ -217,6 +219,7 @@ export function validateBill({
           line,
           "service",
           `Expected at least ${minimumFields} columns but found ${fields.length}.`,
+          source,
         ),
       );
       errors.push(...rowErrors);
@@ -226,7 +229,7 @@ export function validateBill({
     const serviceName = fieldAt(fields, columnIndex.service).trim();
     if (serviceName === "") {
       rowErrors.push(
-        cellError(side, line, "service", "The Service name is empty."),
+        cellError(side, line, "service", "The Service name is empty.", source),
       );
     } else if (firstLineByService.has(serviceName)) {
       rowErrors.push(
@@ -235,6 +238,7 @@ export function validateBill({
           line,
           "service",
           `Duplicate Service "${serviceName}": it already appears on Source line ${firstLineByService.get(serviceName)}. Each Service may appear once per file.`,
+          source,
         ),
       );
     } else {
@@ -245,7 +249,7 @@ export function validateBill({
     const quantityProblem = validateDecimalText(quantityText);
     if (quantityProblem) {
       rowErrors.push(
-        cellError(side, line, "quantity", quantityProblem),
+        cellError(side, line, "quantity", quantityProblem, source),
       );
     }
 
@@ -253,7 +257,7 @@ export function validateBill({
     const unitPriceProblem = validateDecimalText(unitPriceText);
     if (unitPriceProblem) {
       rowErrors.push(
-        cellError(side, line, "unit_price", unitPriceProblem),
+        cellError(side, line, "unit_price", unitPriceProblem, source),
       );
     }
 

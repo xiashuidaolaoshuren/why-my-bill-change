@@ -22,9 +22,10 @@ export default function RootLayout({
           Fonts come from a CDN with a system fallback in globals.css, so an
           offline build or browser still renders the page in fallback faces.
         */}
+        <meta name="theme-color" content="#f5f6f7" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap"
         />
       </head>
       <body>

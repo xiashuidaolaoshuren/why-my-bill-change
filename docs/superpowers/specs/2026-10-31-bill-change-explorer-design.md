@@ -227,7 +227,7 @@ Exact values appear in tooltips and in the expanded row. Display strings appear 
 
 ### Design direction
 
-The look is an editorial ledger: a warm paper canvas (`#f3f0e8`) with ink-black type (`#17140f`), hairline rules doing the structural work instead of card shadows, and 2px corners. Headings are set in Schibsted Grotesk and every figure in IBM Plex Mono with tabular numerals. One deep cobalt accent (`#2341b5`) marks selection; red (`#bf3a2b`) and green (`#2d7a4b`) encode money direction only and are always paired with a sign or an arrow. The summary sentence is the largest type on the page. Motion is limited to state changes and respects `prefers-reduced-motion`.
+The look is a daylight ledger: a cool neutral canvas (`#f5f6f7`) with ink type (`#15191e`), hairline rules (`#2a3038` for structural edges) doing the work instead of card shadows, and 2px corners. Headings are set in Bricolage Grotesque and every figure in JetBrains Mono with tabular numerals. One deep cobalt accent (`#2342c2`) marks selection; red (`#d4452f`) and green (`#2a9459`) encode money direction only and are always paired with a sign or an arrow. The summary sentence is the largest type on the page. Motion is limited to state changes and respects `prefers-reduced-motion`.
 
 Those values are the variables at the top of `prototype/styles.css`. The shadcn tokens are derived from them rather than chosen again.
 

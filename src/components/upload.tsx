@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type DragEvent } from "react";
+import { SAMPLE_DEMOS, type SampleDemoId } from "@/lib/load-sample";
 import type { BillSide } from "@/core/validate";
 
 export type BillFileSlots = { before: File | null; after: File | null };
@@ -38,7 +39,7 @@ type UploadProps = {
   onRemove: (side: BillSide) => void;
   onCompare: () => void;
   onUseSample: () => void;
-  onUseInvalidSample: () => void;
+  onUseDemo: (id: SampleDemoId) => void;
   busy: boolean;
   announce: (message: string) => void;
 };
@@ -74,7 +75,14 @@ function DropZone({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const chooseRef = useRef<HTMLButtonElement>(null);
+  const restoreFocusRef = useRef(false);
   const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    if (file !== null || !restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    chooseRef.current?.focus({ preventScroll: true });
+  }, [file]);
 
   const choose = () => inputRef.current?.click();
 
@@ -114,8 +122,8 @@ function DropZone({
   };
 
   const remove = () => {
+    restoreFocusRef.current = true;
     onRemove(side);
-    chooseRef.current?.focus();
   };
 
   return (
@@ -194,7 +202,7 @@ export function UploadPanel({
   onRemove,
   onCompare,
   onUseSample,
-  onUseInvalidSample,
+  onUseDemo,
   busy,
   announce,
 }: UploadProps) {
@@ -286,17 +294,19 @@ export function UploadPanel({
               Other samples
             </p>
             <ul className="demo-list" aria-labelledby="demo-label">
-              <li>
-                <button
-                  type="button"
-                  className="demo-link"
-                  onClick={onUseInvalidSample}
-                  disabled={busy}
-                >
-                  <span className="demo-name">Invalid</span>
-                  <span className="demo-blurb">Errors by Source line</span>
-                </button>
-              </li>
+              {SAMPLE_DEMOS.filter((demo) => demo.id !== "headline").map((demo) => (
+                <li key={demo.id}>
+                  <button
+                    type="button"
+                    className="demo-link"
+                    onClick={() => onUseDemo(demo.id)}
+                    disabled={busy}
+                  >
+                    <span className="demo-name">{demo.label}</span>
+                    <span className="demo-blurb">{demo.blurb}</span>
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

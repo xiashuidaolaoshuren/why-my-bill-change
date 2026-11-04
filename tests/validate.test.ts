@@ -72,6 +72,7 @@ describe("validateBill file-level header errors", () => {
         line: null,
         column: null,
         message: expect.stringContaining("quantity"),
+        source: null,
       },
     ]);
   });
@@ -88,6 +89,7 @@ describe("validateBill file-level header errors", () => {
         line: null,
         column: null,
         message: expect.stringContaining("unit_price"),
+        source: null,
       },
     ]);
   });
@@ -126,6 +128,7 @@ describe("validateBill cell errors", () => {
         line: 2,
         column: "service",
         message: expect.any(String),
+        source: " ,1,1",
       },
     ]);
   });
@@ -174,6 +177,7 @@ describe("validateBill cell errors", () => {
         line: 3,
         column: "service",
         message: expect.stringContaining("Support"),
+        source: "Support,2,2",
       },
     ]);
   });
@@ -218,6 +222,20 @@ describe("validateBill cell errors", () => {
     });
     expect(result.errors).toEqual([
       expect.objectContaining({ line: 2, column: "quantity" }),
+    ]);
+  });
+
+  it("carries the raw source line on cell errors", () => {
+    const result = validateBill({
+      ...beforeBill,
+      text: "service,quantity,unit_price\nStorage,50,oops",
+    });
+    expect(result.errors).toEqual([
+      expect.objectContaining({
+        line: 2,
+        column: "unit_price",
+        source: "Storage,50,oops",
+      }),
     ]);
   });
 });
@@ -297,6 +315,7 @@ describe("validateBill fatal parse", () => {
         line: null,
         column: null,
         message: expect.any(String),
+        source: null,
       },
     ]);
   });
@@ -316,6 +335,7 @@ good,2,2`,
         line: null,
         column: null,
         message: expect.any(String),
+        source: null,
       },
     ]);
 

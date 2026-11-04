@@ -58,9 +58,9 @@ test("headline sample: summary, Bucket filter, expanded row, clear", async ({
   expect(tooltipText).toContain("-HK$20.00");
   expect(tooltipText).toContain("Exact");
   expect(tooltipText).toContain("From");
-  expect(tooltipText).toContain("HK$430.00");
+  expect(tooltipText).toContain("HK$430");
   expect(tooltipText).toContain("To");
-  expect(tooltipText).toContain("HK$410.00");
+  expect(tooltipText).toContain("HK$410");
   await expect(tooltip.locator(".tt-foot")).toHaveText(
     "1 Contributor · select to filter the table",
   );

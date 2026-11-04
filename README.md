@@ -119,8 +119,8 @@ flowchart LR
 
 - All parsing, validation, matching, and arithmetic live in `src/core/` as plain
   TypeScript: `parse`, `validate`, `compare`, `summary`, `money`, `present`.
-- `POST /api/compare` is a thin adapter. `GET /samples/<file>` serves the three
-  sample CSVs from `samples/`.
+- `POST /api/compare` is a thin adapter. `GET /samples/<file>` serves the six
+  sample CSVs from `samples/` (four demo pairs).
 - The browser never calculates or rounds money. The API sends each amount twice:
   an exact decimal string and a display string rounded to the cent, plus a notice
   when the rounded displays do not add up. Each bucket in the JSON also includes
@@ -156,7 +156,7 @@ server on port 3100.
 | `src/components/` | Upload, headline, waterfall, Buckets, Services table, errors |
 | `src/lib/` | Exact-decimal ordering, table view model, sample loaders |
 | `tests/` | Vitest suites, golden fixtures, Playwright e2e |
-| `samples/` | Headline pair plus one deliberately invalid file |
+| `samples/` | Four demo pairs: Headline, Rounding, Invalid, Opposing |
 | `prototype/` | Static OpenDesign prototype, the visual reference |
 
 [`docs/AI_WORKFLOW.md`](docs/AI_WORKFLOW.md) records how the work was directed

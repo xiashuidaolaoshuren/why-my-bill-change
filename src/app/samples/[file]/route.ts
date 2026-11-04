@@ -5,6 +5,10 @@ const ALLOWED_SAMPLES = new Set([
   "before.csv",
   "after.csv",
   "invalid-before.csv",
+  "rounding-before.csv",
+  "rounding-after.csv",
+  "opposing-before.csv",
+  "opposing-after.csv",
 ]);
 
 type RouteContext = { params: Promise<{ file: string }> };

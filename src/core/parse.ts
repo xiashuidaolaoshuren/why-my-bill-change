@@ -3,7 +3,15 @@ import { parse } from "csv-parse/sync";
 export type ParseRecord = {
   line: number;
   fields: string[];
+  /** Physical source line text without the record terminator. */
+  source: string;
 };
+
+function stripRecordTerminator(raw: string): string {
+  if (raw.endsWith("\r\n")) return raw.slice(0, -2);
+  if (raw.endsWith("\n") || raw.endsWith("\r")) return raw.slice(0, -1);
+  return raw;
+}
 
 export type ParseResult =
   | { ok: true; records: ParseRecord[] }
@@ -44,6 +52,7 @@ export function parseCsv(text: string): ParseResult {
     const records = rows.map(({ info, record, raw }) => ({
       line: recordStartLine(info.lines, raw),
       fields: record,
+      source: stripRecordTerminator(raw),
     }));
 
     return { ok: true, records };

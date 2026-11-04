@@ -110,6 +110,9 @@ export function ValidationErrors({
                     <td className="err-msg" data-label="Message">
                       <div className="err-msg-body">
                         <p>{entry.message}</p>
+                        {entry.source !== null ? (
+                          <code className="err-source">{entry.source || "\u00a0"}</code>
+                        ) : null}
                       </div>
                     </td>
                   </tr>
