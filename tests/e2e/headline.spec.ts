@@ -48,6 +48,7 @@ test("headline sample: summary, Bucket filter, expanded row, clear", async ({
   await expect(page.locator(".rec-value").last()).toHaveText("HK$410");
 
   const removedHit = page.locator('button.wf-hit[data-bucket="removed"]');
+  await removedHit.hover();
   await removedHit.focus();
   const tooltip = page.locator(".wf-tooltip");
   await expect(tooltip).toBeVisible();
