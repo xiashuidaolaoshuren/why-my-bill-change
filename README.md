@@ -24,6 +24,20 @@ npm run dev          # http://localhost:3000
 npm run build && npm start
 ```
 
+## Demonstration
+
+After the container is running, open http://localhost:3000 and choose **Use
+sample files**. Select the Added bucket, then expand Support to see its source
+line and the HK$180 contribution.
+
+The static visual reference is [prototype/index.html](prototype/index.html).
+Open that file in a browser; it needs no install and no server.
+
+The architecture diagram is
+[docs/architecture/bill-change.architecture.html](docs/architecture/bill-change.architecture.html).
+Open that file in a browser. The mermaid sketch under **How it works** is the
+same flow in short form.
+
 ## Input format
 
 UTF-8 CSV with the header `service,quantity,unit_price`, one row per Service:
@@ -119,8 +133,9 @@ flowchart LR
 
 - All parsing, validation, matching, and arithmetic live in `src/core/` as plain
   TypeScript: `parse`, `validate`, `compare`, `summary`, `money`, `present`.
-- `POST /api/compare` is a thin adapter. `GET /samples/<file>` serves the six
-  sample CSVs from `samples/` (four demo pairs).
+- `POST /api/compare` is a thin adapter. `GET /samples/<file>` serves the seven
+  sample CSVs from `samples/`. The four demos are Headline, Rounding, Invalid,
+  and Opposing. Invalid reuses the headline `after.csv`.
 - The browser never calculates or rounds money. The API sends each amount twice:
   an exact decimal string and a display string rounded to the cent, plus a notice
   when the rounded displays do not add up. Each bucket in the JSON also includes

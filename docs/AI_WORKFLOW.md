@@ -14,6 +14,8 @@ tests cannot see.
 | Vitest + `fast-check` | Golden fixtures, property tests, validation, API route, sort and ordering units |
 | Playwright | One browser run over the headline and error flows, desktop and 390px |
 | Browser automation (CDP) | Inspect layout, element geometry, ARIA state, and computed styles during development |
+| OpenDesign | Daylight UI pass so the Next.js app matches the live prototype |
+| Archify | Standalone architecture diagram (`docs/architecture/bill-change.architecture.html`) |
 | Docker, GitHub Actions | Ship and re-verify the same image the reviewer runs |
 
 ## Key steps
@@ -31,6 +33,9 @@ tests cannot see.
 | `79bd555` | F4 | Hand-built SVG waterfall and Bucket selection |
 | `664a8c8` | F5 | Exact decimal order, Services table, grouped errors |
 | F6 | Delivery | Playwright, ESLint plus a core grep, Dockerfile, CI, README, this document |
+| `5adb34f` | UI parity | Daylight tokens, Rounding / Invalid / Opposing demos, error source chips |
+| `8fd966a` | Diagram | Architecture HTML and its source JSON |
+| `9a886e1` | CI flake | Headline e2e hovers the Removed bar before focusing it |
 
 Two decisions changed from the original plan and are recorded in the plan
 changelog: the waterfall is hand-built SVG rather than Recharts, and the table
@@ -47,6 +52,7 @@ Approximate, from commit timestamps; days are 4-6 focused hours.
 | 2026-11-02, early | Plan, B1-B4 (money, parse, validate, compare, summary, API, fixtures) | 5h |
 | 2026-11-02, late | F1-F6 (shell, upload, headline, chart, table, e2e, Docker, CI, docs) | 6h |
 | 2026-11-04 | Code review fixes: csv-parse and UTF-8 validation, row validation, client/core boundary | 1h |
+| 2026-11-04, later | Daylight UI parity, architecture diagram, Removed-bar tooltip flake | 3h |
 
 ## AI mistakes, and the test that caught each
 
@@ -109,6 +115,13 @@ re-reading the code.
     That module pulls in decimal.js. Fixed by `src/core/contract.ts` and
     `src/lib/display.ts`; verified with `npm run typecheck` and the existing
     Playwright headline flow.
+13. **Removed-bar tooltip stuck on Before total (CI).** Focusing the Removed
+    waterfall hit scrolled the chart under Playwright's cursor, which stayed at
+    the viewport origin, so `pointerenter` on the Before column rewrote the
+    shared tooltip after focus. Caught by `tests/e2e/headline.spec.ts` (title
+    stayed `Before total` for the whole timeout). The test now hovers that hit
+    before focusing it. Re-ran `npx playwright test tests/e2e/headline.spec.ts`:
+    3 passed.
 
 ## What the verification is worth
 
