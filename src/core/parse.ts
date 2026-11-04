@@ -56,7 +56,7 @@ export function parseCsv(text: string): ParseResult {
         ? (error as { code: string }).code
         : undefined;
 
-    if (code === "CSV_QUOTE_NOT_CLOSED") {
+    if (typeof code === "string") {
       return { ok: false };
     }
 

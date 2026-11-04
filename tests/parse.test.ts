@@ -42,4 +42,12 @@ good,2,2`;
     const result = parseCsv(text);
     expect(result).toEqual({ ok: false });
   });
+
+  it("returns ok false on an invalid closing quote", () => {
+    const text = `service,quantity,unit_price
+"Compute"x,1,1`;
+
+    const result = parseCsv(text);
+    expect(result).toEqual({ ok: false });
+  });
 });

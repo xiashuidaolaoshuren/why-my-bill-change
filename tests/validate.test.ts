@@ -240,6 +240,23 @@ describe("validateBill size limits", () => {
 });
 
 describe("validateBill fatal parse", () => {
+  it("returns one file-level error for an invalid closing quote", () => {
+    const result = validateBill({
+      ...beforeBill,
+      text: `service,quantity,unit_price
+"Compute"x,1,1`,
+    });
+    expect(result.services).toEqual([]);
+    expect(result.errors).toEqual([
+      {
+        file: "before",
+        line: null,
+        column: null,
+        message: expect.any(String),
+      },
+    ]);
+  });
+
   it("returns one file-level error and does not block validating another bill", () => {
     const broken = validateBill({
       side: "before",
