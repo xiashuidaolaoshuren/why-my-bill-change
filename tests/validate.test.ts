@@ -130,6 +130,37 @@ describe("validateBill cell errors", () => {
     ]);
   });
 
+  it("reports all blank cells on a comma-only data row", () => {
+    const result = validateBill({
+      ...beforeBill,
+      text: "service,quantity,unit_price\n,,",
+    });
+    expect(result.services).toEqual([]);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ line: 2, column: "service" }),
+        expect.objectContaining({ line: 2, column: "quantity" }),
+        expect.objectContaining({ line: 2, column: "unit_price" }),
+      ]),
+    );
+    expect(result.errors).toHaveLength(3);
+  });
+
+  it("reports a duplicate even when the first row failed another cell", () => {
+    const result = validateBill({
+      ...beforeBill,
+      text: "service,quantity,unit_price\nCompute,nope,1\nCompute,2,2",
+    });
+    expect(result.services).toEqual([]);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ line: 2, column: "quantity" }),
+        expect.objectContaining({ line: 3, column: "service" }),
+      ]),
+    );
+    expect(result.errors).toHaveLength(2);
+  });
+
   it("keeps the first service and errors on the later duplicate line", () => {
     const result = validateBill({
       ...beforeBill,

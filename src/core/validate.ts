@@ -59,10 +59,6 @@ function stripBom(text: string): string {
   return text.replace(/^\uFEFF/, "");
 }
 
-function isBlankRecord(fields: string[]): boolean {
-  return fields.every((field) => field.trim() === "");
-}
-
 function validateDecimalText(text: string): string | null {
   const trimmed = text.trim();
   if (trimmed === "") {
@@ -192,9 +188,7 @@ export function validateBill({
   const minimumFields =
     Math.max(...Object.values(columnIndex)) + 1;
 
-  const dataRecords = parsed.records
-    .slice(1)
-    .filter((record) => !isBlankRecord(record.fields));
+  const dataRecords = parsed.records.slice(1);
 
   if (dataRecords.length > MAX_DATA_ROWS) {
     return {
@@ -243,6 +237,8 @@ export function validateBill({
           `Duplicate Service "${serviceName}": it already appears on Source line ${firstLineByService.get(serviceName)}. Each Service may appear once per file.`,
         ),
       );
+    } else {
+      firstLineByService.set(serviceName, line);
     }
 
     const quantityText = fieldAt(fields, columnIndex.quantity);
@@ -266,7 +262,6 @@ export function validateBill({
       continue;
     }
 
-    firstLineByService.set(serviceName, line);
     services.push({
       service: serviceName,
       quantity: new Decimal(quantityText.trim()),
