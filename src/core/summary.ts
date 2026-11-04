@@ -1,9 +1,10 @@
-import type { Bucket, BucketKey, Comparison } from "./compare";
+import type { Bucket, Comparison } from "./compare";
+import type { BucketKey, Tone } from "./contract";
 import { Decimal, money } from "./money";
 
-type DecimalInstance = InstanceType<typeof Decimal>;
+export type { Tone } from "./contract";
 
-export type Tone = "up" | "down" | "flat";
+type DecimalInstance = InstanceType<typeof Decimal>;
 
 export type SummaryPart =
   | { type: "text"; text: string }

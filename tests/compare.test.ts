@@ -1,7 +1,8 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { assertReconciliation, BUCKET_KEYS, compareBills } from "../src/core/compare";
-import type { Bucket, BucketKey, Comparison } from "../src/core/compare";
+import { assertReconciliation, compareBills } from "../src/core/compare";
+import type { Bucket, Comparison } from "../src/core/compare";
+import { BUCKET_KEYS, type BucketKey } from "../src/core/contract";
 import { Decimal } from "../src/core/money";
 import type { ValidatedService } from "../src/core/validate";
 

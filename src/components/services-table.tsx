@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { exactText, isCentExact, toneOfExact } from "@/components/headline";
-import type { BucketKey } from "@/core/compare";
+import type { BucketKey } from "@/core/contract";
 import type { CompareResponse, MoneyJson, RowJson, RowSideJson } from "@/core/present";
 import {
   contributionOf,

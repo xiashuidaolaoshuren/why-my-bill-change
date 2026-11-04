@@ -2,9 +2,8 @@
 
 import { useRef, type RefObject } from "react";
 import { exactText, isCentExact, toneOfExact } from "@/components/headline";
-import { BUCKET_KEYS, type BucketKey } from "@/core/compare";
+import { BUCKET_KEYS, type BucketKey, type Tone } from "@/core/contract";
 import type { CompareResponse } from "@/core/present";
-import type { Tone } from "@/core/summary";
 
 const BUCKET_LABELS: Record<BucketKey, string> = {
   added: "Added",

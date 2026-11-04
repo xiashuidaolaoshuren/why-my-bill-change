@@ -1,18 +1,12 @@
+import type { BucketKey, RowStatus } from "./contract";
+import { BUCKET_KEYS } from "./contract";
 import { Decimal } from "./money";
 import type { ValidatedService } from "./validate";
 
+export type { BucketKey, RowStatus } from "./contract";
+export { BUCKET_KEYS } from "./contract";
+
 type DecimalInstance = InstanceType<typeof Decimal>;
-
-export type RowStatus = "added" | "removed" | "changed" | "unchanged";
-
-export type BucketKey = "added" | "usage" | "price" | "removed";
-
-export const BUCKET_KEYS: readonly BucketKey[] = [
-  "added",
-  "usage",
-  "price",
-  "removed",
-];
 
 export type ComparedRow = {
   service: string;
@@ -47,7 +41,7 @@ function normalized(value: DecimalInstance): DecimalInstance {
   return value.isZero() ? zero() : value;
 }
 
-function cost(service: ValidatedService): DecimalInstance {
+export function cost(service: ValidatedService): DecimalInstance {
   return service.quantity.times(service.unitPrice);
 }
 

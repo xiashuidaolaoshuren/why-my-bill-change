@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { BUCKET_KEYS } from "../src/core/compare";
-import type { Bucket, BucketKey, Comparison } from "../src/core/compare";
+import type { Bucket, Comparison } from "../src/core/compare";
+import { BUCKET_KEYS, type BucketKey } from "../src/core/contract";
 import { Decimal } from "../src/core/money";
 import { buildSummary, displayRoundingNotice } from "../src/core/summary";
 

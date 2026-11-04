@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import type { CompareResponse, MoneyJson } from "@/core/present";
-import type { Tone } from "@/core/summary";
+import type { Tone } from "@/core/contract";
 
 /**
  * Headline pieces of the result view. Every figure comes from the API as a

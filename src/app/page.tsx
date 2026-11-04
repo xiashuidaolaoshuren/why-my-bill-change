@@ -12,7 +12,7 @@ import { UploadPanel, type BillFileSlots } from "@/components/upload";
 import { ValidationErrors } from "@/components/errors";
 import { ServicesTable } from "@/components/services-table";
 import { Waterfall } from "@/components/waterfall";
-import type { BucketKey } from "@/core/compare";
+import type { BucketKey } from "@/core/contract";
 import type { CompareResponse } from "@/core/present";
 import type { BillSide, ValidationError } from "@/core/validate";
 import {

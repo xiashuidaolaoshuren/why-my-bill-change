@@ -10,9 +10,8 @@ import {
   type CSSProperties,
 } from "react";
 import { exactText, toneOfExact } from "@/components/headline";
-import { BUCKET_KEYS, type BucketKey } from "@/core/compare";
+import { BUCKET_KEYS, type BucketKey, type Tone } from "@/core/contract";
 import type { CompareResponse, MoneyJson } from "@/core/present";
-import type { Tone } from "@/core/summary";
 
 const CHART = {
   columnMinWidth: 600,

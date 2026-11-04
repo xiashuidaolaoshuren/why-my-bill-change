@@ -1,5 +1,7 @@
-import { BUCKET_KEYS, rowBucketEffect } from "./compare";
-import type { BucketKey, ComparedRow, Comparison } from "./compare";
+import { cost, rowBucketEffect } from "./compare";
+import type { ComparedRow, Comparison } from "./compare";
+import type { BucketKey } from "./contract";
+import { BUCKET_KEYS } from "./contract";
 import { Decimal, money } from "./money";
 import { buildSummary, displayRoundingNotice } from "./summary";
 import type { DisplayRoundingNotice, SummaryPart } from "./summary";
@@ -53,7 +55,7 @@ function sideJson(service: ValidatedService): RowSideJson {
   return {
     quantity: quantityJson(service.quantity),
     unitPrice: money(service.unitPrice),
-    cost: money(service.quantity.times(service.unitPrice)),
+    cost: money(cost(service)),
   };
 }
 

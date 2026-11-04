@@ -1,4 +1,4 @@
-import type { BucketKey, RowStatus } from "@/core/compare";
+import type { BucketKey, RowStatus } from "@/core/contract";
 import type { MoneyJson, RowJson } from "@/core/present";
 import { compareExact, compareExactMagnitude } from "@/lib/exact-order";
 
