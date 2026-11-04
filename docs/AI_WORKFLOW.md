@@ -46,6 +46,7 @@ Approximate, from commit timestamps; days are 4-6 focused hours.
 | 2026-10-31 | Scope, domain terms, design spec, static prototype | 5h |
 | 2026-11-02, early | Plan, B1-B4 (money, parse, validate, compare, summary, API, fixtures) | 5h |
 | 2026-11-02, late | F1-F6 (shell, upload, headline, chart, table, e2e, Docker, CI, docs) | 6h |
+| 2026-11-04 | Code review fixes: csv-parse and UTF-8 validation, row validation, client/core boundary | 1h |
 
 ## AI mistakes, and the test that caught each
 
@@ -88,10 +89,30 @@ re-reading the code.
 8. **PowerShell shell mistakes.** Combining `&&` with heredocs in the commit
    step failed, and only the shell caught it. Commit messages are now written
    with plain sequential commands.
+9. **Only unclosed-quote CSV errors became a 400 (review).** Other csv-parse
+   failures such as `"Compute"x,1,1` were rethrown and could escape validation.
+   Caught by `tests/parse.test.ts` ("returns ok false on an invalid closing
+   quote") and `tests/validate.test.ts` ("returns one file-level error for an
+   invalid closing quote"); `parseCsv` now maps any csv-parse error code to
+   `{ ok: false }`.
+10. **Invalid UTF-8 was accepted via `File.text()` (review).** Replacement
+    characters let a corrupted service name through as a successful compare.
+    Caught by `tests/validate.test.ts` ("rejects bytes that are not valid
+    UTF-8") and `tests/api-compare.test.ts` ("returns 400 for invalid UTF-8 on
+    one bill and still validates the other"); the route now decodes with fatal
+    UTF-8 before validation.
+11. **Blank comma-only rows were dropped; duplicates after a bad row were missed
+    (review).** Caught by `tests/validate.test.ts` ("reports all blank cells on
+    a comma-only data row" and "reports a duplicate even when the first row
+    failed another cell").
+12. **Client components imported `BUCKET_KEYS` from `compare.ts` (review).**
+    That module pulls in decimal.js. Fixed by `src/core/contract.ts` and
+    `src/lib/display.ts`; verified with `npm run typecheck` and the existing
+    Playwright headline flow.
 
 ## What the verification is worth
 
-- 100 unit, fixture, property, validation, and API tests (`npm test`).
+- 107 unit, fixture, property, validation, and API tests (`npm test`).
 - Three Playwright tests covering the demo path named in the design spec:
   HK$240.00 summary, Added Bucket narrows the table to Support, its worked
   formula and source line, then the invalid sample with grouped errors and no
